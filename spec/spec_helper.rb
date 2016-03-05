@@ -5,7 +5,7 @@ require 'rspec'
 require 'coveralls'
 Coveralls.wear!
 
-#Dir[File.join(File.dirname(__FILE__), '..', "spec/support/**/*.rb")].each { |f| require f }
+Dir[File.join(File.dirname(__FILE__), '..', "spec/support/**/*.rb")].each { |f| require f }
 
 #VCR.configure do |config|
 #  config.cassette_library_dir = "spec/cassettes"
