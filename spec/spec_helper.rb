@@ -1,4 +1,6 @@
-require 'rails'
+require 'active_model'
+require 'faker'
+require 'factory_girl'
 require 'lycra'
 require 'rspec'
 #require 'vcr'
@@ -6,6 +8,7 @@ require 'coveralls'
 Coveralls.wear!
 
 Dir[File.join(File.dirname(__FILE__), '..', "spec/support/**/*.rb")].each { |f| require f }
+Dir[File.join(File.dirname(__FILE__), '..', "spec/factories/**/*.rb")].each { |f| require f }
 
 #VCR.configure do |config|
 #  config.cassette_library_dir = "spec/cassettes"
@@ -18,7 +21,10 @@ RSpec.configure do |config|
   #  capture_stdout { load "db/schema.rb" }
   #  load 'support/models.rb'
   #end
-  
+
+  # configure factory_girl syntax methods
+  config.include FactoryGirl::Syntax::Methods
+
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
   # assertions if you prefer.
