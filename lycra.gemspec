@@ -14,6 +14,7 @@ Gem::Specification.new do |s|
   s.test_files  = Dir["spec/**/*"]
 
   s.add_dependency "canfig"
+  s.add_dependency "activemodel"
   s.add_dependency "elasticsearch"
   s.add_dependency "elasticsearch-model"
 
