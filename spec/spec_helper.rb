@@ -1,3 +1,4 @@
+require 'rails'
 require 'lycra'
 require 'rspec'
 #require 'vcr'
