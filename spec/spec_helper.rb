@@ -25,6 +25,14 @@ RSpec.configure do |config|
   # configure factory_girl syntax methods
   config.include FactoryGirl::Syntax::Methods
 
+  # ensure starting with a fresh index and wipe it when we're done
+  config.before(:suite) do
+    Person.__elasticsearch__.delete_index!(force: true, index: :lycra) if Person.__elasticsearch__.index_exists?(index: :lycra)
+  end
+  config.after(:suite) do
+    Person.__elasticsearch__.delete_index!(force: true, index: :lycra) if Person.__elasticsearch__.index_exists?(index: :lycra)
+  end
+
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
   # assertions if you prefer.

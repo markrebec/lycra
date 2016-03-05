@@ -1,4 +1,5 @@
 require 'canfig'
+require 'elasticsearch/model'
 require 'lycra/engine' if defined?(Rails)
 
 module Lycra
