@@ -1,5 +1,5 @@
 require 'canfig'
-require 'lycra/engine'
+require 'lycra/engine' if defined?(Rails)
 
 module Lycra
   include Canfig::Module
