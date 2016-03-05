@@ -10,6 +10,6 @@ module Lycra
   end
 
   def self.logger
-    configuration.logger || Logger.new(STDOUT)
+    @logger ||= configuration.logger || Logger.new(STDOUT)
   end
 end
