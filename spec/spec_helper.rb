@@ -15,6 +15,10 @@ Dir[File.join(File.dirname(__FILE__), '..', "spec/factories/**/*.rb")].each { |f
 #  config.hook_into :webmock
 #end
 
+LYCRA_ES1_CLIENT = Elasticsearch::Client.new host: 'localhost', port: 9201
+LYCRA_ES2_CLIENT = Elasticsearch::Client.new host: 'localhost', port: 9202
+Elasticsearch::Model.client = LYCRA_ES1_CLIENT
+
 RSpec.configure do |config|
   #config.before(:suite) do
   #  ActiveRecord::Base.establish_connection adapter: "sqlite3", database: ":memory:"
@@ -28,6 +32,7 @@ RSpec.configure do |config|
   # ensure starting with a fresh index and wipe it when we're done
   config.before(:suite) do
     Person.__elasticsearch__.delete_index!(force: true, index: :lycra) if Person.__elasticsearch__.index_exists?(index: :lycra)
+    Person.__elasticsearch__.create_index!(force: true, index: :lycra)
   end
   config.after(:suite) do
     Person.__elasticsearch__.delete_index!(force: true, index: :lycra) if Person.__elasticsearch__.index_exists?(index: :lycra)
