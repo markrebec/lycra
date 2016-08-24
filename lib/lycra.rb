@@ -1,17 +1,23 @@
 require 'canfig'
 require 'elasticsearch/model'
-require 'lycra/query'
 require 'lycra/engine' if defined?(Rails)
 
 module Lycra
   include Canfig::Module
 
   configure do |config|
-    config.elastic_host   = nil           # the elasticsearch host to use
-    config.logger         = nil           # defaults to STDOUT but will use Rails.logger in a rails environment via Lycra::Engine
+    config.elasticsearch_host = ENV['ELASTICSEARCH_HOST'] || 'localhost'    # elasticsearch host to use when connecting, defaults to ENV var if set or falls back to localhost
+    config.elasticsearch_port = ENV['ELASTICSEARCH_PORT'] || 9200           # elasticsearch port to use when connecting, defaults to ENV var if set or falls back to 9200
+    config.elasticsearch_url  = nil                                         # elasticsearch URL to use when connecting (i.e. 'localhost:9200'), not set by default and will override host/port if set
+    config.logger             = nil                                         # defaults to STDOUT but will use Rails.logger in a rails environment (via Lycra::Engine)
+
+    def elasticsearch_url
+      @state[:elasticsearch_url] || "#{self.elasticsearch_host}:#{self.elasticsearch_port}"
+    end
+
+    def logger
+      @logger ||= (@state[:logger] || Logger.new(STDOUT))
+    end
   end
 
-  def self.logger
-    @logger ||= configuration.logger || Logger.new(STDOUT)
-  end
 end
