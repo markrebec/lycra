@@ -1,6 +1,7 @@
 require 'logger'
 require 'canfig'
 require 'elasticsearch/model'
+require 'lycra/errors'
 require 'lycra/model'
 require 'lycra/search'
 require 'lycra/engine' if defined?(Rails)
