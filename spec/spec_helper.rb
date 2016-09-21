@@ -1,42 +1,20 @@
-require 'active_model'
 require 'faker'
 require 'factory_girl'
 require 'lycra'
 require 'rspec'
-#require 'vcr'
 require 'coveralls'
 Coveralls.wear!
 
-Dir[File.join(File.dirname(__FILE__), '..', "spec/support/**/*.rb")].each { |f| require f }
+#Dir[File.join(File.dirname(__FILE__), '..', "spec/support/**/*.rb")].each { |f| require f }
 Dir[File.join(File.dirname(__FILE__), '..', "spec/factories/**/*.rb")].each { |f| require f }
 
-#VCR.configure do |config|
-#  config.cassette_library_dir = "spec/cassettes"
-#  config.hook_into :webmock
-#end
-
-LYCRA_ES1_CLIENT = Elasticsearch::Client.new host: 'localhost', port: 9201
-LYCRA_ES2_CLIENT = Elasticsearch::Client.new host: 'localhost', port: 9202
-Elasticsearch::Model.client = LYCRA_ES1_CLIENT
+#LYCRA_ES1_CLIENT = Elasticsearch::Client.new host: 'localhost', port: 9201
+LYCRA_ES2_CLIENT = Elasticsearch::Client.new host: 'localhost', port: 4500
+Elasticsearch::Model.client = LYCRA_ES2_CLIENT
 
 RSpec.configure do |config|
-  #config.before(:suite) do
-  #  ActiveRecord::Base.establish_connection adapter: "sqlite3", database: ":memory:"
-  #  capture_stdout { load "db/schema.rb" }
-  #  load 'support/models.rb'
-  #end
-
   # configure factory_girl syntax methods
   config.include FactoryGirl::Syntax::Methods
-
-  # ensure starting with a fresh index and wipe it when we're done
-  config.before(:suite) do
-    Person.__elasticsearch__.delete_index!(force: true, index: :lycra) if Person.__elasticsearch__.index_exists?(index: :lycra)
-    Person.__elasticsearch__.create_index!(force: true, index: :lycra)
-  end
-  config.after(:suite) do
-    Person.__elasticsearch__.delete_index!(force: true, index: :lycra) if Person.__elasticsearch__.index_exists?(index: :lycra)
-  end
 
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest

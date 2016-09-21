@@ -11,26 +11,26 @@ RSpec.describe Lycra do
 
       before do
         Lycra.configuration.configure(logger: logger)
-        Lycra.instance_variable_set(:@logger, nil)
+        Lycra.configuration.instance_variable_set(:@logger, nil)
       end
 
       it 'uses the custom logger' do
-        expect(Lycra.logger).to eq(logger)
+        expect(Lycra.configuration.logger).to eq(logger)
       end
     end
 
     context 'with default configuration' do
       before do
         Lycra.configuration.configure(logger: nil)
-        Lycra.instance_variable_set(:@logger, nil)
+        Lycra.configuration.instance_variable_set(:@logger, nil)
       end
 
       it 'is an instance of Logger' do
-        expect(Lycra.logger).to be_an_instance_of(::Logger)
+        expect(Lycra.configuration.logger).to be_an_instance_of(::Logger)
       end
 
       it 'uses STDOUT' do
-        expect(Lycra.logger.instance_variable_get(:@logdev).dev).to eq(STDOUT)
+        expect(Lycra.configuration.logger.instance_variable_get(:@logdev).dev).to eq(STDOUT)
       end
     end
   end
