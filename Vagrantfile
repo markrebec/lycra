@@ -7,36 +7,41 @@
 # you're doing.
 Vagrant.configure(2) do |config|
 
-  config.vm.define "lycra" do |docker|
-    docker.vm.provider "virtualbox" do |virtualbox|
-      virtualbox.name = "lycra"
+  config.vm.define "lycra" do |dev|
+    dev.vm.provider "virtualbox" do |virtualbox|
+      virtualbox.name = "lycra-development"
+      virtualbox.memory = 1024
     end
-    docker.vm.box = "bento/ubuntu-14.04"
-    docker.vm.hostname = "lycra"
-    docker.vm.provision "docker"
-    docker.vm.network :forwarded_port, guest: 9201, host: 9201
-    docker.vm.network :forwarded_port, guest: 9202, host: 9202
+    dev.vm.box = "bento/ubuntu-14.04"
+    dev.vm.hostname = "lycra-development"
+    dev.vm.network :forwarded_port, guest: 5601,  host: 4501 # Kibana UI
+    dev.vm.network :forwarded_port, guest: 9200,  host: 4500 # Elasticsearch API
+    dev.vm.network :forwarded_port, guest: 22,    host: 4522, id: 'ssh'
+    dev.vm.provision "docker"
   end
 
-  # Elasticsearch 1.7.5
-  config.vm.define "lycra-es1" do |elasticsearch|
+  config.vm.define "elasticsearch" do |elasticsearch|
     elasticsearch.vm.provider "docker" do |docker|
       docker.vagrant_vagrantfile = "./Vagrantfile"
       docker.vagrant_machine = "lycra"
-      docker.image = "elasticsearch:1.7.5"
-      docker.ports = ['9201:9200']
-      docker.name = "lycra-es1"
+
+      docker.name = "elasticsearch"
+      docker.image = "elasticsearch:2.3.5"
+      docker.ports = ['9200:9200', '9300:9300']
     end
   end
 
-  # Elasticsearch 2.2.0
-  config.vm.define "lycra-es2" do |elasticsearch|
-    elasticsearch.vm.provider "docker" do |docker|
+  config.vm.define "kibana" do |kibana|
+    kibana.vm.provider "docker" do |docker|
       docker.vagrant_vagrantfile = "./Vagrantfile"
       docker.vagrant_machine = "lycra"
-      docker.image = "elasticsearch:2.2.0"
-      docker.ports = ['9202:9200']
-      docker.name = "lycra-es2"
+
+      docker.name = "kibana"
+      docker.build_dir = "./kibana"
+      docker.link "elasticsearch:elasticsearch"
+      docker.ports = ['5601:5601']
+      docker.volumes = ['/vagrant/kibana/config/:/opt/kibana/config/']
     end
   end
+
 end
