@@ -1,5 +1,6 @@
 require 'logger'
 require 'canfig'
+require 'elasticsearch/persistence'
 require 'elasticsearch/model'
 require 'lycra/errors'
 require 'lycra/model'
@@ -38,5 +39,4 @@ module Lycra
       tracer: configuration.tracer
     )
   end
-
 end
