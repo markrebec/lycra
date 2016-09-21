@@ -7,5 +7,9 @@ module Lycra
         config.logger = Rails.logger
       end
     end
+
+    initializer "lycra.elasticsearch.client" do |app|
+      Elasticsearch::Model.client = Lycra.client
+    end
   end
 end
