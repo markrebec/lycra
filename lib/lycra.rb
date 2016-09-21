@@ -1,6 +1,8 @@
 require 'logger'
 require 'canfig'
 require 'elasticsearch/model'
+require 'lycra/model'
+require 'lycra/search'
 require 'lycra/engine' if defined?(Rails)
 
 module Lycra
@@ -10,6 +12,7 @@ module Lycra
     config.elasticsearch_host = ENV['ELASTICSEARCH_HOST'] || 'localhost'    # elasticsearch host to use when connecting, defaults to ENV var if set or falls back to localhost
     config.elasticsearch_port = ENV['ELASTICSEARCH_PORT'] || 9200           # elasticsearch port to use when connecting, defaults to ENV var if set or falls back to 9200
     config.elasticsearch_url  = ENV['ELASTICSEARCH_URL']                    # elasticsearch URL to use when connecting (i.e. 'https://localhost:9200'), this will override host/port if set
+    config.page_size          = 50                                          # default number of results to return per-page when searching an index
     config.index_prefix       = nil                                         # a prefix to use for index names (i.e. 'my-app' prefix and 'people' index becomes 'my-app-people')
     config.log                = false                                       # whether or not the elasticsearch client should perform standard logging
     config.logger             = nil                                         # logger use for standard elasticsearch logging, defaults to STDOUT but will use Rails.logger in a rails environment (via Lycra::Engine)
