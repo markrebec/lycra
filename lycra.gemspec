@@ -14,15 +14,13 @@ Gem::Specification.new do |s|
   s.test_files  = Dir["spec/**/*"]
 
   s.add_dependency "canfig"
-  s.add_dependency "activemodel"
-  s.add_dependency "elasticsearch"
+  s.add_dependency "elasticsearch", ">= 1.0.18"
+  s.add_dependency "elasticsearch-persistence"
   s.add_dependency "elasticsearch-model"
+  s.add_dependency "elasticsearch-rails"
 
-  s.add_development_dependency "rails", ">=4"
-  s.add_development_dependency "rake"
+  s.add_development_dependency "sqlite3"
   s.add_development_dependency "rspec"
-  s.add_development_dependency "faker"
   s.add_development_dependency "factory_girl"
-  #s.add_development_dependency "vcr"
-  #s.add_development_dependency "webmock"
+  s.add_development_dependency "faker", ">= 1.6.6"
 end
