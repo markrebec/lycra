@@ -2,7 +2,7 @@ module Lycra
   module Search
     module Pagination
       def self.included(base)
-        base.send :delegate, :total_pages, :current_page, :limit_value, :offset_value, :last_page?, to: :response
+        base.send :delegate, :total_pages, :current_page, :limit_value, :offset_value, :first_page?, :last_page?, to: :response
 
         base.send :alias_method, :pages, :total_pages
       end
