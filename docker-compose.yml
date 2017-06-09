@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  elasticsearch235:
+    image: elasticsearch:2.3.5
+    ports:
+      - "9235:9200"
+
+  kibana454:
+    build: ./kibana
+    ports:
+      - "5454:5601"
+    links:
+      - 'elasticsearch235:elasticsearch'
+    volumes:
+      - "./kibana/config/:/opt/kibana/config/"
+
+  elasticsearch530:
+    image: elasticsearch:5.3.0
+    ports:
+      - "9530:9200"
+
+  kibana530:
+    image: kibana:5.3.0
+    ports:
+      - "5530:5601"
+    links:
+      - 'elasticsearch530:elasticsearch'
