@@ -12,8 +12,8 @@ module Lycra
 
     class << self
       def inherited(base)
-        # Make sure we inherit the parent's class-level instance variables whenever we inherit from the class.
-        # TODO add more comments/examples explaining why we clone these vars
+        # Make sure we inherit the parent's class-level instance variables whenever we inherit from the class,
+        # but clone the values in order to avoid modifying the parent class' attributes..
         base.send :instance_variable_set, :@lycra_index_name,    index_name.try(:dup)
         base.send :instance_variable_set, :@lycra_document_type, document_type.try(:dup)
         base.send :instance_variable_set, :@lycra_attributes,    attributes.try(:dup)
