@@ -5,6 +5,7 @@ require 'elasticsearch/model'
 require 'lycra/monkeypatches'
 require 'lycra/errors'
 require 'lycra/model'
+require 'lycra/attribute'
 require 'lycra/search'
 require 'lycra/engine' if defined?(Rails)
 
