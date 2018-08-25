@@ -5,7 +5,7 @@ module Lycra
     def self.type_for(type)
       case
         when type == String
-          'string'
+          'text'
         when type == Integer
           'integer'
         when type == Float
@@ -14,14 +14,17 @@ module Lycra
           'date'
         when type == Hash
           'object'
+        when type == Array # makes some pretty strong assumptions about using the nested data type...
+          'nested'
         when type == Lycra::Text
           'text'
         when type == Lycra::Boolean
           'boolean'
+        when type.is_a?(String) || type.is_a?(Symbol) # allow for all the variations of types like long, double, half_float, etc. https://www.elastic.co/guide/en/elasticsearch/reference/5.5/mapping-types.html
+          type.to_s
       end
     end
 
-    # TODO make mappings kwargs?
     def initialize(name, type=nil, mappings={}, &block)
       @name = name
       @type = type
@@ -62,6 +65,9 @@ module Lycra
 
     def valid_for_type?(value)
       case
+        when type == Array
+          # TODO need to account for arrays that aren't intended to be used as :nested JSON data, since ES handles them sorta seamlessly
+          value.is_a?(Array) && (value.empty? || value.first.is_a?(Hash)) # need to do better than value.first here
         when type == String
           value.is_a?(String)
         when type == Integer
@@ -76,6 +82,8 @@ module Lycra
           value.is_a?(String)
         when type == Lycra::Boolean
           value.in?([true, false])
+        else
+          true # for all the miscellaneous data types
       end
     end
   end
