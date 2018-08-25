@@ -2,11 +2,12 @@ require 'yaml'
 require 'active_record'
 
 namespace :db do
-  env = ENV['LYCRA_ENV'] || 'development'
-  db_config = YAML::load(File.open('config/database.yml'))[env]
 
   desc "Create the database"
   task :create do
+    env = ENV['LYCRA_ENV'] || 'development'
+    db_config = YAML::load(File.open('config/database.yml'))[env]
+
     ActiveRecord::Base.establish_connection(db_config)
     if db_config['adapter'] == 'sqlite3'
       ActiveRecord::Base.connection # forces sqlite to create the empty db file
@@ -18,6 +19,9 @@ namespace :db do
 
   desc "Migrate the database"
   task :migrate do
+    env = ENV['LYCRA_ENV'] || 'development'
+    db_config = YAML::load(File.open('config/database.yml'))[env]
+
     ActiveRecord::Base.establish_connection(db_config)
     ActiveRecord::MigrationContext.new("db/migrate/").migrate
 
@@ -27,6 +31,9 @@ namespace :db do
 
   desc "Rollback the database by one migration"
   task :rollback do
+    env = ENV['LYCRA_ENV'] || 'development'
+    db_config = YAML::load(File.open('config/database.yml'))[env]
+
     ActiveRecord::Base.establish_connection(db_config)
     ActiveRecord::MigrationContext.new("db/migrate/").rollback
 
@@ -36,6 +43,9 @@ namespace :db do
 
   desc "Drop the database"
   task :drop do
+    env = ENV['LYCRA_ENV'] || 'development'
+    db_config = YAML::load(File.open('config/database.yml'))[env]
+
     ActiveRecord::Base.establish_connection(db_config)
     if db_config['adapter'] == 'sqlite3'
       File.unlink(db_config["database"]) rescue nil
@@ -48,15 +58,38 @@ namespace :db do
   desc "Reset the database"
   task :reset => [:drop, :create, :migrate]
 
+  namespace :test do
+    task :environment do
+      ENV['LYCRA_ENV'] = 'test'
+    end
+
+    desc "Prepare the test database to run specs"
+    task :prepare => ['db:test:environment', 'db:drop', 'db:create', 'db:schema:load']
+  end
+
   namespace :schema do
     desc 'Create a db/schema.rb file that is portable against any DB supported by AR'
     task :dump do
+      env = ENV['LYCRA_ENV'] || 'development'
+      db_config = YAML::load(File.open('config/database.yml'))[env]
+
       ActiveRecord::Base.establish_connection(db_config)
       require 'active_record/schema_dumper'
       filename = "db/schema.rb"
       File.open(filename, "w:utf-8") do |file|
         ActiveRecord::SchemaDumper.dump(ActiveRecord::Base.connection, file)
       end
+    end
+
+    desc 'Load the db/schema.rb file into the database'
+    task :load do
+      env = ENV['LYCRA_ENV'] || 'development'
+      db_config = YAML::load(File.open('config/database.yml'))[env]
+
+      ActiveRecord::Base.establish_connection(db_config)
+      filename = "db/schema.rb"
+      ActiveRecord::Schema.load(filename)
+      puts "Loaded schema into env #{env}"
     end
   end
 end
