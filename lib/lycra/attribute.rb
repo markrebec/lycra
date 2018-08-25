@@ -1,6 +1,6 @@
 module Lycra
   class Attribute
-    attr_reader :name, :type, :mappings, :description, :resolver
+    attr_reader :name, :type, :mappings, :description, :resolver, :resolved
 
     def self.type_for(type)
       case
@@ -25,11 +25,16 @@ module Lycra
       end
     end
 
-    def initialize(name, type=nil, mappings={}, &block)
+    def initialize(name, type=nil, *args, **opts, &block)
       @name = name
       @type = type
-      @mappings = mappings
-      @resolver = -> (obj, args, ctx) { obj.send(name) }
+      @mappings = opts[:mappings] || {}
+
+      if args.first.is_a?(Proc)
+        @resolver = args.first
+      else
+        @resolver = -> (obj, arg, ctx) { obj.send(name) }
+      end
 
       instance_exec &block if block_given?
     end
@@ -49,21 +54,27 @@ module Lycra
       @description
     end
 
+    def resolve!(obj, *args, **ctx)
+      return @resolved unless @resolved.nil?
+
+      @resolved = resolver.call(obj, args, ctx)
+
+      raise Lycra::AttributeError, "Invalid value #{@resolved} (#{@resolved.class.name}) for type #{type} in field #{name} on #{obj}" unless valid_for_type?(@resolved)
+
+      @resolved
+    end
+
+    private
+
     def resolve(resolver=nil, &block)
       @resolver = resolver if resolver
       @resolver = block if block_given?
       @resolver
     end
 
-    def resolve!(obj, *args, **ctx)
-      resolved = resolver.call(obj, args, ctx)
-      raise Lycra::AttributeError, "Invalid value #{resolved} (#{resolved.class.name}) for type #{type} in field #{name} on #{obj}" unless valid_for_type?(resolved)
-      resolved
-    end
-
-    private
-
     def valid_for_type?(value)
+      return true if value.nil?
+
       case
         when type == Array
           # TODO need to account for arrays that aren't intended to be used as :nested JSON data, since ES handles them sorta seamlessly
