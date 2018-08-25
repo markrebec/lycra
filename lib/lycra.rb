@@ -2,10 +2,11 @@ require 'logger'
 require 'canfig'
 require 'elasticsearch/persistence'
 require 'elasticsearch/model'
-require 'lycra/monkeypatches'
+#require 'lycra/monkeypatches' # TODO still need this?
 require 'lycra/errors'
-require 'lycra/model'
+require 'lycra/types'
 require 'lycra/attribute'
+require 'lycra/model'
 require 'lycra/search'
 require 'lycra/engine' if defined?(Rails)
 
