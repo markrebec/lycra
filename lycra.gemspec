@@ -4,13 +4,13 @@ require "lycra/version"
 Gem::Specification.new do |s|
   s.name        = "lycra"
   s.version     = Lycra::Version::VERSION
-  s.summary     = "Business intelligence based on elasticsearch queries"
-  s.description = "Open source business intelligence based on elasticsearch queries, inspired by https://github.com/ankane/blazer"
+  s.summary     = "Better elasticsearch documents for ruby"
+  s.description = "Better elasticsearch documents for ruby"
   s.authors     = ["Mark Rebec"]
   s.email       = ["mark@markrebec.com"]
   s.homepage    = "http://github.com/markrebec/lycra"
 
-  s.files       = Dir["lib/**/*", "app/**/*"]
+  s.files       = Dir["lib/lycra.rb", "lib/lycra/**/*", "app/**/*"]
   s.test_files  = Dir["spec/**/*"]
 
   s.add_dependency "canfig"
