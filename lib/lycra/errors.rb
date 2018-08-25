@@ -1,6 +1,19 @@
 module Lycra
   class AttributeError < StandardError; end
-  class MissingSubjectError < StandardError; end
+
+  class MissingSubjectError < StandardError
+    def initialize(document=nil)
+      msg = "This document was initialized with a nil subject. "
+
+      if document && document.is_a?(Lycra::Document::Base)
+        msg += "It looks like you're inheriting from the Lycra::Document::Base class, so make sure to pass an object when calling `#{document.class.name}.new` or `#{document.class.name}.resolve!`, and if you're overriding the initializer be sure to call `super` with the appropriate argument or set @_lycra_subject yourself."
+      else
+        msg += "It looks like you're using the Lycra::Document mixin, make sure you set @_lycra_subject before resolving (i.e. in your class initializer)."
+      end
+
+      super(msg)
+    end
+  end
 
   class DocumentNotFoundError < StandardError
     attr_reader :model

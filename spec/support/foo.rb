@@ -19,6 +19,8 @@
       @_lycra_subject = args.first
     end
 
+    document_type 'Thingamajig'
+
     attribute :foo, String
 
     attribute :bar, Integer do
