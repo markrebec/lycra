@@ -1,4 +1,6 @@
 module Lycra
+  class AttributeError < StandardError; end
+
   class DocumentNotFoundError < StandardError
     attr_reader :model
 
