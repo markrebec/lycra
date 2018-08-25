@@ -1,6 +1,6 @@
 require 'byebug'
 require 'faker'
-require 'factory_girl'
+require 'factory_bot'
 require 'active_record'
 require 'yaml'
 require 'lycra'
@@ -17,8 +17,8 @@ Dir[File.join(File.dirname(__FILE__), '..', "spec/support/**/*.rb")].each { |f| 
 Dir[File.join(File.dirname(__FILE__), '..', "spec/factories/**/*.rb")].each { |f| require f }
 
 RSpec.configure do |config|
-  # configure factory_girl syntax methods
-  config.include FactoryGirl::Syntax::Methods
+  # configure factory_bot syntax methods
+  config.include FactoryBot::Syntax::Methods
 
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
