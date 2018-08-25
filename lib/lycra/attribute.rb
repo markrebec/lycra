@@ -30,8 +30,10 @@ module Lycra
       @type = type
       @mappings = opts[:mappings] || {}
 
-      @resolver = args.first { |arg| arg.is_a?(Proc) || arg.is_a?(Symbol) }
+      @resolver = args.find { |arg| arg.is_a?(Proc) || arg.is_a?(Symbol) }
       @resolver ||= -> (obj, arg, ctx) { obj.send(name) }
+
+      @description = args.find { |arg| arg.is_a?(String) }
 
       instance_exec &block if block_given?
     end
