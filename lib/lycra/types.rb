@@ -5,6 +5,8 @@ module Lycra
   Date      = ::Date
   Time      = ::Time
   DateTime  = ::DateTime
+  Hash      = ::Hash
+  Array     = ::Array
   class Text;     end
   class Boolean;  end
 end
