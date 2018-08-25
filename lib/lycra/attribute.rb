@@ -30,11 +30,8 @@ module Lycra
       @type = type
       @mappings = opts[:mappings] || {}
 
-      if args.first.is_a?(Proc)
-        @resolver = args.first
-      else
-        @resolver = -> (obj, arg, ctx) { obj.send(name) }
-      end
+      @resolver = args.first { |arg| arg.is_a?(Proc) || arg.is_a?(Symbol) }
+      @resolver ||= -> (obj, arg, ctx) { obj.send(name) }
 
       instance_exec &block if block_given?
     end
@@ -57,7 +54,11 @@ module Lycra
     def resolve!(obj, *args, **ctx)
       return @resolved unless @resolved.nil?
 
-      @resolved = resolver.call(obj, args, ctx)
+      if resolver.is_a?(Proc)
+        @resolved = resolver.call(obj, args, ctx)
+      elsif resolver.is_a?(Symbol)
+        @resolved = obj.send(resolver)
+      end
 
       raise Lycra::AttributeError, "Invalid value #{@resolved} (#{@resolved.class.name}) for type #{type} in field #{name} on #{obj}" unless valid_for_type?(@resolved)
 
