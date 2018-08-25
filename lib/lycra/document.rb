@@ -1,4 +1,4 @@
 module Lycra
-  module Model
+  module Document
   end
 end
