@@ -6,3 +6,4 @@ coverage
 spec/cassettes
 .vagrant
 .byebug_history
+db/*.db

@@ -11,7 +11,7 @@ end
 
 desc "Open an irb session preloaded with this library"
 task :console do
-  sh "irb -r rubygems -I lib -r lycra -r byebug"
+  sh "irb -r rubygems -I lib -r ./console"
 end
 
 task :build do
