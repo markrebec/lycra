@@ -6,27 +6,7 @@ module Lycra
       # generic enough to build simple serializers or whatever
       base.send :include, Attributes
       # elasticsearch specific
-      base.send :include, Naming
-      base.send :include, Settings
-    end
-
-    module Naming
-      def self.included(base)
-        base.send :extend, ClassMethods
-        base.send :delegate, :document_type, :index_name, to: base
-      end
-
-      module ClassMethods
-        def document_type(type=nil)
-          @_lycra_document_type = type if type
-          @_lycra_document_type ||= name.demodulize.gsub(/Document\Z/, '') # TODO ActiveSupport
-        end
-
-        def index_name(index=nil)
-          @_lycra_index_name = index if index
-          @_lycra_index_name ||= document_type.underscore.pluralize # TODO ActiveSupport
-        end
-      end
+      base.send :include, Indexing
     end
 
     module Attributes
@@ -61,13 +41,24 @@ module Lycra
       end
     end
 
-    module Settings
+    module Indexing
       def self.included(base)
         base.send :extend, ClassMethods
-        base.send :delegate, :mapping, :mappings, :settings, to: base
+        base.send :delegate, :document_type, :index_name,
+                  :mapping, :mappings, :settings, to: base
       end
 
       module ClassMethods
+        def document_type(type=nil)
+          @_lycra_document_type = type if type
+          @_lycra_document_type ||= name.demodulize.gsub(/Document\Z/, '') # TODO ActiveSupport
+        end
+
+        def index_name(index=nil)
+          @_lycra_index_name = index if index
+          @_lycra_index_name ||= document_type.underscore.pluralize # TODO ActiveSupport
+        end
+
         def mapping(mapping=nil)
           @_lycra_mapping = mapping if mapping
           @_lycra_mapping || {}
