@@ -67,6 +67,15 @@ module Lycra
       @resolved
     end
 
+    def to_h
+      {
+        name: name,
+        type: type,
+        description: description,
+        resolver: resolver.class
+      }
+    end
+
     private
 
     def resolve(resolver=nil, &block)
