@@ -14,10 +14,9 @@ Gem::Specification.new do |s|
   s.test_files  = Dir["spec/**/*"]
 
   s.add_dependency "canfig"
-  s.add_dependency "elasticsearch", ">= 1.0.18"
-  s.add_dependency "elasticsearch-persistence"
-  s.add_dependency "elasticsearch-model"
-  s.add_dependency "elasticsearch-rails"
+  s.add_dependency "elasticsearch-persistence", "~> 5.0"
+  s.add_dependency "elasticsearch-model", "~> 5.0"
+  s.add_dependency "elasticsearch-rails", "~>5.0"
 
   s.add_development_dependency "rake"
   s.add_development_dependency "sqlite3"
