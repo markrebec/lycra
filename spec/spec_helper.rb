@@ -12,6 +12,7 @@ ActiveRecord::Base.establish_connection(
   YAML::load(File.open('config/database.yml'))['test']
 )
 
+Dir[File.join(File.dirname(__FILE__), '..', "app/models/**/*.rb")].each { |f| require f }
 Dir[File.join(File.dirname(__FILE__), '..', "spec/support/**/*.rb")].each { |f| require f }
 Dir[File.join(File.dirname(__FILE__), '..', "spec/factories/**/*.rb")].each { |f| require f }
 

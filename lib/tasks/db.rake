@@ -25,6 +25,15 @@ namespace :db do
     puts "Database migrated for env #{env}."
   end
 
+  desc "Rollback the database by one migration"
+  task :rollback do
+    ActiveRecord::Base.establish_connection(db_config)
+    ActiveRecord::MigrationContext.new("db/migrate/").rollback
+
+    Rake::Task["db:schema:dump"].invoke
+    puts "Database migrated for env #{env}."
+  end
+
   desc "Drop the database"
   task :drop do
     ActiveRecord::Base.establish_connection(db_config)
@@ -49,5 +58,25 @@ namespace :db do
         ActiveRecord::SchemaDumper.dump(ActiveRecord::Base.connection, file)
       end
     end
+  end
+end
+
+namespace :g do
+  desc "Generate a migration"
+  task :migration do
+    name = ARGV[1] || raise("Specify name: rake g:migration your_migration")
+    timestamp = Time.now.strftime("%Y%m%d%H%M%S")
+    path = File.expand_path("../../../db/migrate/#{timestamp}_#{name}.rb", __FILE__)
+    migration_class = name.split("_").map(&:capitalize).join
+
+    File.write(path, <<~MIGRATION_BODY)
+class #{migration_class} < ActiveRecord::Migration[5.0]
+  def change
+  end
+end
+    MIGRATION_BODY
+
+    puts "Migration #{path} created"
+    exit
   end
 end
