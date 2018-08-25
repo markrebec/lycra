@@ -5,12 +5,12 @@ require 'rspec'
 require 'coveralls'
 Coveralls.wear!
 
-#Dir[File.join(File.dirname(__FILE__), '..', "spec/support/**/*.rb")].each { |f| require f }
+Dir[File.join(File.dirname(__FILE__), '..', "spec/support/**/*.rb")].each { |f| require f }
 Dir[File.join(File.dirname(__FILE__), '..', "spec/factories/**/*.rb")].each { |f| require f }
 
 #LYCRA_ES1_CLIENT = Elasticsearch::Client.new host: 'localhost', port: 9201
-LYCRA_ES2_CLIENT = Elasticsearch::Client.new host: 'localhost', port: 4500
-Elasticsearch::Model.client = LYCRA_ES2_CLIENT
+#LYCRA_ES2_CLIENT = Elasticsearch::Client.new host: 'localhost', port: 4500
+#Elasticsearch::Model.client = LYCRA_ES2_CLIENT
 
 RSpec.configure do |config|
   # configure factory_girl syntax methods
