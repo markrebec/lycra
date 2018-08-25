@@ -3,6 +3,7 @@
 #
 
 require 'byebug'
+require 'awesome_print'
 require 'active_record'
 require 'lycra'
 
