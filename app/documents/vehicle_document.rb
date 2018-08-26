@@ -1,30 +1,30 @@
 class VehicleDocument < Lycra::Document::Base
   attribute :slug,
-            String,
+            types.text,
             'A unique slug'
 
   attribute name: :name,
-            type: String,
+            type: types.text,
             description: 'The name of the vehicle'
 
-  attribute do
+  attribute! do
     name :description
-    type Lycra::Text
+    type types.text
     description 'A description of the vehicle'
   end
 
   attribute :summary,
-            Lycra::Text,
+            types.text,
             'The first description',
             ->(obj,arg,ctx) { "first" },
             name: :summary,
-            type: Lycra::Text,
+            type: types.text,
             description: 'The second description',
             resolve: ->(obj,arg,ctx) { "second" },
             mapping: {index: :not_analyzed} do
 
     name        :summary
-    type        Lycra::Text
+    type        types.text
     description 'The third description'
     mappings    ({index: :not_analyzed})
     resolve     ->(obj, arg, ctx) do

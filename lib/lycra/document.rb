@@ -18,9 +18,17 @@ module Lycra
       end
 
       module ClassMethods
+        def types
+          Lycra::Types
+        end
+
         def attribute(name=nil, type=nil, *args, **opts, &block)
           attrib = Attribute.new(name, type, *args, **opts, &block)
           attributes[attrib.name] = attrib
+        end
+
+        def attribute!(name=nil, type=nil, *args, **opts, &block)
+          attribute(name, type, *args, **opts.merge({required: true}), &block)
         end
 
         def attributes
@@ -52,12 +60,12 @@ module Lycra
       module ClassMethods
         def document_type(type=nil)
           @_lycra_document_type = type if type
-          @_lycra_document_type ||= name.demodulize.gsub(/Document\Z/, '') # TODO ActiveSupport
+          @_lycra_document_type ||= name.demodulize.gsub(/Document\Z/, '')
         end
 
         def index_name(index=nil)
           @_lycra_index_name = index if index
-          @_lycra_index_name ||= document_type.underscore.pluralize # TODO ActiveSupport
+          @_lycra_index_name ||= document_type.underscore.pluralize
         end
 
         def mapping(mapping=nil)

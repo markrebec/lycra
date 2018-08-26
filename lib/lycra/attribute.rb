@@ -1,29 +1,6 @@
 module Lycra
   class Attribute
-    attr_reader :resolved
-
-    def self.type_for(type)
-      case
-        when type == String
-          'text'
-        when type == Integer
-          'integer'
-        when type == Float
-          'float'
-        when type == Date || type == Time || type == DateTime
-          'date'
-        when type == Hash
-          'object'
-        when type == Array # makes some pretty strong assumptions about using the nested data type...
-          'nested'
-        when type == Lycra::Text
-          'text'
-        when type == Lycra::Boolean
-          'boolean'
-        when type.is_a?(String) || type.is_a?(Symbol) # allow for all the variations of types like long, double, half_float, etc. https://www.elastic.co/guide/en/elasticsearch/reference/5.5/mapping-types.html
-          type.to_s
-      end
-    end
+    attr_reader :resolved, :required
 
     def initialize(name=nil, type=nil, *args, **opts, &block)
       @name = name
@@ -41,12 +18,13 @@ module Lycra
       @description = args.find { |arg| arg.is_a?(String) }
       @description = opts[:description] if opts.key?(:description)
 
+      @required = opts[:required] || false
+
       instance_exec &block if block_given?
     end
 
     def name(name=nil)
       @name = name if name
-      # TODO raise if no name?
       @name
     end
 
@@ -57,7 +35,7 @@ module Lycra
 
     def mappings(mappings=nil)
       @mappings = mappings if mappings
-      {type: self.class.type_for(type)}.merge(@mappings || {})
+      {type: type.type}.merge(@mappings || {})
     end
     alias_method :mapping, :mappings
 
@@ -70,24 +48,31 @@ module Lycra
       @resolver ||= name.to_sym
     end
 
+    def required!
+      @required = true
+    end
+
     def resolve!(obj, *args, **ctx)
       return @resolved unless @resolved.nil?
 
       if resolver.is_a?(Proc)
-        @resolved = resolver.call(obj, args, ctx)
+        result = resolver.call(obj, args, ctx)
       elsif resolver.is_a?(Symbol)
-        @resolved = obj.send(resolver)
+        result = obj.send(resolver)
       end
 
-      raise Lycra::AttributeError, "Invalid value #{@resolved} (#{@resolved.class.name}) for type #{type} in field #{name} on #{obj}" unless valid_for_type?(@resolved)
+      @resolved = type.new(result)
 
-      @resolved
+      raise Lycra::AttributeError, "Invalid value #{@resolved.value} (#{@resolved.value.class.name}) for type '#{@resolved.type}' in field #{name} on #{obj}" unless @resolved.valid?(@required)
+
+      @resolved.transform
     end
 
     def as_json(opts={})
       {
         name: name,
-        type: type.try(:name) || type,
+        type: type.type,
+        required: required,
         description: description,
         mappings: mappings,
         resolver: resolver.is_a?(Symbol) ? resolver : resolver.to_s
@@ -102,30 +87,8 @@ module Lycra
       @resolver
     end
 
-    def valid_for_type?(value)
-      return true if value.nil?
-
-      case
-        when type == Array
-          # TODO need to account for arrays that aren't intended to be used as :nested JSON data, since ES handles them sorta seamlessly
-          value.is_a?(Array) && (value.empty? || value.first.is_a?(Hash)) # need to do better than value.first here
-        when type == String
-          value.is_a?(String)
-        when type == Integer
-          value.is_a?(Integer)
-        when type == Float
-          value.is_a?(Float)
-        when type == Date || type == Time || type == DateTime
-          value.is_a?(Date) || value.is_a?(Time) || value.is_a?(DateTime)
-        when type == Hash
-          value.is_a?(Hash)
-        when type == Lycra::Text
-          value.is_a?(String)
-        when type == Lycra::Boolean
-          value.in?([true, false])
-        else
-          true # for all the miscellaneous data types
-      end
+    def types
+      Lycra::Types
     end
   end
 end
