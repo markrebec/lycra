@@ -18,8 +18,9 @@ module Lycra
       end
 
       module ClassMethods
-        def attribute(name, type=nil, *args, **opts, &block)
-          attributes[name] = Attribute.new(name, type, *args, **opts, &block)
+        def attribute(name=nil, type=nil, *args, **opts, &block)
+          attrib = Attribute.new(name, type, *args, **opts, &block)
+          attributes[attrib.name] = attrib
         end
 
         def attributes

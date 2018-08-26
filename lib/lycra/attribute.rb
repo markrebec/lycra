@@ -1,6 +1,6 @@
 module Lycra
   class Attribute
-    attr_reader :name, :type, :mappings, :description, :resolver, :resolved
+    attr_reader :resolved
 
     def self.type_for(type)
       case
@@ -25,17 +25,29 @@ module Lycra
       end
     end
 
-    def initialize(name, type=nil, *args, **opts, &block)
+    def initialize(name=nil, type=nil, *args, **opts, &block)
       @name = name
+      @name ||= opts[:name]
+
       @type = type
-      @mappings = opts[:mappings] || {}
+      @type ||= opts[:type]
+
+      @mappings = opts[:mappings] || opts[:mapping]
 
       @resolver = args.find { |arg| arg.is_a?(Proc) || arg.is_a?(Symbol) }
-      @resolver ||= -> (obj, arg, ctx) { obj.send(name) }
+      @resolver = opts[:resolve] if opts.key?(:resolve)
+      @resolver = opts[:resolver] if opts.key?(:resolver)
 
       @description = args.find { |arg| arg.is_a?(String) }
+      @description = opts[:description] if opts.key?(:description)
 
       instance_exec &block if block_given?
+    end
+
+    def name(name=nil)
+      @name = name if name
+      # TODO raise if no name?
+      @name
     end
 
     def type(type=nil)
@@ -47,10 +59,15 @@ module Lycra
       @mappings = mappings if mappings
       {type: self.class.type_for(type)}.merge(@mappings || {})
     end
+    alias_method :mapping, :mappings
 
     def description(description=nil)
       @description = description if description
       @description
+    end
+
+    def resolver
+      @resolver ||= name.to_sym
     end
 
     def resolve!(obj, *args, **ctx)
@@ -67,12 +84,13 @@ module Lycra
       @resolved
     end
 
-    def to_h
+    def as_json(opts={})
       {
         name: name,
-        type: type,
+        type: type.try(:name) || type,
         description: description,
-        resolver: resolver.class
+        mappings: mappings,
+        resolver: resolver.is_a?(Symbol) ? resolver : resolver.to_s
       }
     end
 
