@@ -70,7 +70,9 @@ module Lycra
 
         def mapping(mapping=nil)
           @_lycra_mapping = mapping if mapping
-          @_lycra_mapping || {}
+          { document_type.to_s.underscore.to_sym => (@_lycra_mapping || {}).merge({
+              properties: attributes.map { |name, type| [name, type.mapping] }.to_h
+          }) }
         end
         alias_method :mappings, :mapping
 

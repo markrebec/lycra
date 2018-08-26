@@ -1,4 +1,7 @@
 class VehicleDocument < Lycra::Document::Base
+  settings index: { number_of_shards: 1 }
+  mappings dynamic: 'false'
+
   attribute :slug,
             types.text,
             'A unique slug'
@@ -13,20 +16,9 @@ class VehicleDocument < Lycra::Document::Base
     description 'A description of the vehicle'
   end
 
-  attribute :summary,
-            types.text,
-            'The first description',
-            ->(obj,arg,ctx) { "first" },
-            name: :summary,
-            type: types.text,
-            description: 'The second description',
-            resolve: ->(obj,arg,ctx) { "second" },
-            mapping: {index: :not_analyzed} do
-
-    name        :summary
-    type        types.text
+  attribute :summary, types.text do
     description 'The third description'
-    mappings    ({index: :not_analyzed})
+    mappings    ({index: 'not_analyzed'})
     resolve     ->(obj, arg, ctx) do
       "#{obj.name} #{obj.description}"
     end
