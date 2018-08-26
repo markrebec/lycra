@@ -15,3 +15,5 @@ ActiveRecord::Base.establish_connection(
 )
 
 ActiveRecord::Base.logger = Logger.new(STDOUT)
+
+Elasticsearch::Model.client = Elasticsearch::Client.new host: 'localhost', port: 9256
