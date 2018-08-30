@@ -11,6 +11,25 @@ module Lycra
       # elasticsearch specific
       base.send :include, Proxy
       base.send :include, Indexing
+
+      base.class_eval do
+        # This does some work required to setup new instances of things
+        # that won't conflict with the parent class
+        def self.inherited(child)
+          child.send :delegate, :document_type, :document_model, :index_name, to: child
+
+          child.class_eval do
+            class << self
+              delegate :import, :search, to: :__lycra__
+            end
+
+            self.__lycra__.class_eval do
+              include  ::Elasticsearch::Model::Importing::ClassMethods
+              include  ::Elasticsearch::Model::Adapter.from_class(child).importing_mixin
+            end
+          end
+        end
+      end
     end
 
     module ClassMethods
@@ -40,23 +59,9 @@ module Lycra
           attribute! :id, types.integer # TODO only for activerecord models
 
           # This clones parent attribues down to inheriting child classes
-          # and then does some work required to setup new instances of things
-          # that won't conflict with the parent class
           def self.inherited(child)
             child.send :instance_variable_set, :@_lycra_attributes, self.attributes.try(:dup)
             child.send :delegate, :attributes, to: child
-            child.send :delegate, :document_type, :document_model, :index_name, to: child
-
-            child.class_eval do
-              class << self
-                delegate :import, :search, to: :__lycra__
-              end
-
-              self.__lycra__.class_eval do
-                include  ::Elasticsearch::Model::Importing::ClassMethods
-                include  ::Elasticsearch::Model::Adapter.from_class(child).importing_mixin
-              end
-            end
           end
         end
       end
@@ -82,10 +87,6 @@ module Lycra
         def resolve!(obj, *args, **context)
           new(obj).resolve!(*args, **context)
         end
-
-        def as_indexed_json(obj, options={})
-          resolve!(obj).as_json(options)
-        end
       end
 
       module InstanceMethods
@@ -95,10 +96,6 @@ module Lycra
             [ key, attr.resolve!(_lycra_subject, args, context) ]
           end.to_h
         end
-
-        def as_indexed_json(options={})
-          resolve!.as_json(options)
-        end
       end
     end
 
@@ -106,6 +103,7 @@ module Lycra
     module Indexing
       def self.included(base)
         base.send :extend,  ClassMethods
+        base.send :include, InstanceMethods
         base.send :delegate, :document_type, :document_model, :index_name, to: base
       end
 
@@ -148,6 +146,16 @@ module Lycra
         def settings(settings=nil)
           @_lycra_settings = settings if settings
           @_lycra_settings || {}
+        end
+
+        def as_indexed_json(obj, options={})
+          resolve!(obj).as_json(options)
+        end
+      end
+
+      module InstanceMethods
+        def as_indexed_json(options={})
+          resolve!.as_json(options)
         end
       end
     end
