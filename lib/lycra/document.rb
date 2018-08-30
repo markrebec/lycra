@@ -40,9 +40,23 @@ module Lycra
           attribute! :id, types.integer # TODO only for activerecord models
 
           # This clones parent attribues down to inheriting child classes
+          # and then does some work required to setup new instances of things
+          # that won't conflict with the parent class
           def self.inherited(child)
             child.send :instance_variable_set, :@_lycra_attributes, self.attributes.try(:dup)
             child.send :delegate, :attributes, to: child
+            child.send :delegate, :document_type, :document_model, :index_name, to: child
+
+            child.class_eval do
+              class << self
+                delegate :import, :search, to: :__lycra__
+              end
+
+              self.__lycra__.class_eval do
+                include  ::Elasticsearch::Model::Importing::ClassMethods
+                include  ::Elasticsearch::Model::Adapter.from_class(child).importing_mixin
+              end
+            end
           end
         end
       end

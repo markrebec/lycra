@@ -3,8 +3,8 @@ class BaseDocument < Lycra::Document::Base
 end
 
 class VehicleDocument < BaseDocument
-  settings index: { number_of_shards: 1 }
-  mappings dynamic: 'false'
+  #settings index: { number_of_shards: 1 }
+  #mappings dynamic: 'false'
 
   #attribute! :id, types.integer, 'A unique identifier'
 
