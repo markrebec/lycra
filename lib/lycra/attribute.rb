@@ -53,7 +53,7 @@ module Lycra
     end
 
     def resolve!(obj, *args, **ctx)
-      return @resolved unless @resolved.nil?
+      return @resolved.transform unless @resolved.nil?
 
       if resolver.is_a?(Proc)
         result = resolver.call(obj, args, ctx)

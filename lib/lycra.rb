@@ -2,11 +2,13 @@ require 'logger'
 require 'canfig'
 require 'elasticsearch/persistence'
 require 'elasticsearch/model'
+require 'elasticsearch/model/adapters/lycra'
 #require 'lycra/monkeypatches' # TODO still need this?
 require 'lycra/errors'
 require 'lycra/types'
 require 'lycra/attribute'
 require 'lycra/document'
+require 'lycra/document/base'
 require 'lycra/model'
 require 'lycra/search'
 require 'lycra/engine' if defined?(Rails)
@@ -35,7 +37,7 @@ module Lycra
   end
 
   def self.client
-    @client ||= Elasticsearch::Client.new(
+    @client ||= ::Elasticsearch::Client.new(
       host: configuration.elasticsearch_url,
       log: configuration.log,
       logger: configuration.logger,

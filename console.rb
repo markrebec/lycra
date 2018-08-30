@@ -16,4 +16,10 @@ ActiveRecord::Base.establish_connection(
 
 ActiveRecord::Base.logger = Logger.new(STDOUT)
 
+# configure this for models where we're testing direct elasticsearch integrations
 Elasticsearch::Model.client = Elasticsearch::Client.new host: 'localhost', port: 9256
+
+Lycra.configure do |config|
+  config.elasticsearch_host = 'localhost'
+  config.elasticsearch_port = 9256
+end

@@ -1,6 +1,12 @@
-class VehicleDocument < Lycra::Document::Base
+class BaseDocument < Lycra::Document::Base
+  attribute! :gid, types.integer, :id, 'Global ID of this object'
+end
+
+class VehicleDocument < BaseDocument
   settings index: { number_of_shards: 1 }
   mappings dynamic: 'false'
+
+  #attribute! :id, types.integer, 'A unique identifier'
 
   attribute :slug,
             types.text,
