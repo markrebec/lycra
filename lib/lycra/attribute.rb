@@ -53,7 +53,10 @@ module Lycra
     end
 
     def resolve!(obj, *args, **ctx)
-      return @resolved.transform unless @resolved.nil?
+      # don't memoize for now because it doesn't pick up model changes
+      # TODO maybe compare the original value to @resolved if it exists
+      # and refresh if it changed?
+      #return @resolved.transform unless @resolved.nil?
 
       if resolver.is_a?(Proc)
         result = resolver.call(obj, args, ctx)
