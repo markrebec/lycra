@@ -1,38 +1,22 @@
-require 'lycra/attribute'
 require 'lycra/document/proxy'
 
 module Lycra
   module Document
+    # TODO copy this to a Lycra::Serializer and strip it down
     def self.included(base)
       base.send :extend,  ClassMethods
       base.send :include, InstanceMethods
+
       # generic enough to build simple serializers or whatever
       base.send :include, Attributes
+
       # elasticsearch specific
       base.send :include, Proxy
       base.send :include, Indexing
-
-      base.class_eval do
-        # This does some work required to setup new instances of things
-        # that won't conflict with the parent class
-        def self.inherited(child)
-          child.send :delegate, :document_type, :document_model, :index_name, to: child
-
-          child.class_eval do
-            class << self
-              delegate :import, :search, to: :__lycra__
-            end
-
-            self.__lycra__.class_eval do
-              include  ::Elasticsearch::Model::Importing::ClassMethods
-              include  ::Elasticsearch::Model::Adapter.from_class(child).importing_mixin
-            end
-          end
-        end
-      end
     end
 
     module ClassMethods
+      # TODO only needed by Lycra::Model::Document
       def find(*args, &block)
         new(document_model.find(*args, &block))
       end
@@ -48,66 +32,36 @@ module Lycra
       end
     end
 
-    module Attributes
-      def self.included(base)
-        base.send :attr_accessor, :_lycra_subject
-        base.send :extend, ClassMethods
-        base.send :include, InstanceMethods
-        base.send :delegate, :attributes, to: base
-
-        base.class_eval do
-          attribute! :id, types.integer # TODO only for activerecord models
-
-          # This clones parent attribues down to inheriting child classes
-          def self.inherited(child)
-            child.send :instance_variable_set, :@_lycra_attributes, self.attributes.try(:dup)
-            child.send :delegate, :attributes, to: child
-          end
-        end
-      end
-
-      module ClassMethods
-        def types
-          Lycra::Types
-        end
-
-        def attribute(name=nil, type=nil, *args, **opts, &block)
-          attr = Attribute.new(name, type, *args, **opts, &block)
-          attributes[attr.name] = attr
-        end
-
-        def attribute!(name=nil, type=nil, *args, **opts, &block)
-          attribute(name, type, *args, **opts.merge({required: true}), &block)
-        end
-
-        def attributes
-          @_lycra_attributes ||= {}
-        end
-
-        def resolve!(obj, *args, **context)
-          new(obj).resolve!(*args, **context)
-        end
-      end
-
-      module InstanceMethods
-        def resolve!(*args, **context)
-          raise Lycra::MissingSubjectError.new(self) if _lycra_subject.nil?
-          attributes.map do |key,attr|
-            [ key, attr.resolve!(_lycra_subject, args, context) ]
-          end.to_h
-        end
-      end
-    end
-
     # TODO move this all into the proxy to better emulate the elasticsearch-model stuff
     module Indexing
       def self.included(base)
         base.send :extend,  ClassMethods
         base.send :include, InstanceMethods
+        # TODO document_model is only needed by Lycra::Model::Document
         base.send :delegate, :document_type, :document_model, :index_name, to: base
       end
 
       module ClassMethods
+        # This does some work required to setup new instances of things
+        # that won't conflict with the parent class
+        def inherited(child)
+          super if defined?(super)
+
+          # TODO document_model is only needed by Lycra::Model::Document
+          child.send :delegate, :document_type, :document_model, :index_name, to: child
+
+          child.class_eval do
+            self.__lycra__.class_eval do
+              include  ::Elasticsearch::Model::Importing::ClassMethods
+              include  ::Elasticsearch::Model::Adapter.from_class(child).importing_mixin
+            end
+
+            class << self
+              delegate :import, :search, to: :__lycra__
+            end
+          end
+        end
+
         def index_name(index=nil)
           @_lycra_index_name = index if index
           @_lycra_index_name ||= document_type.pluralize

@@ -1,7 +1,6 @@
 class BaseSerializer
-  include Lycra::Document::Attributes
+  include Lycra::Attributes
 
-  # TODO renamespace attributes to Lycra::Attributes
   # TODO Lycra::Serializer
   def initialize(subject)
     @_lycra_subject = subject

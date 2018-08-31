@@ -6,7 +6,7 @@ require 'elasticsearch/model/adapters/lycra'
 #require 'lycra/monkeypatches' # TODO still need this?
 require 'lycra/errors'
 require 'lycra/types'
-require 'lycra/attribute'
+require 'lycra/attributes'
 require 'lycra/document'
 require 'lycra/document/base'
 require 'lycra/model'

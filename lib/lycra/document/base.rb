@@ -1,9 +1,8 @@
+# TODO move this to LycraDocument / LycraSerializer ?
 module Lycra
   module Document
     class Base
-      def self.inherited(base)
-        base.send :include, Lycra::Document
-      end
+      include Document
 
       def initialize(subject)
         @_lycra_subject = subject
