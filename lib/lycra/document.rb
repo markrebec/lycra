@@ -116,8 +116,28 @@ module Lycra
           resolve!.as_json(options)
         end
 
+        def indexed
+          @indexed ||= self.class.search({query: {terms: {id: [_lycra_subject.id]}}}).results.first
+        end
+
+        def indexed?
+          !!indexed
+        end
+
+        def reload
+          super if defined?(super)
+          @indexed = nil
+          self
+        end
+
         def inspect
-          "#<#{self.class.name} index: #{index_name}, document: #{document_type}, #{attributes.map { |key,attr| "#{attr.name}: #{attr.resolve!(_lycra_subject).to_json}"}.join(', ')}>"
+          if @resolved
+            "#<#{self.class.name} index: #{index_name}, document: #{document_type}, #{@resolved.map { |key,attr| "#{key}: #{attr.to_json}"}.join(', ')}>"
+          elsif @indexed
+            "#<#{self.class.name} index: #{index_name}, document: #{document_type}, #{@indexed._source.map { |key,attr| "#{key}: #{attr.to_json}"}.join(', ')}>"
+          else
+            "#<#{self.class.name} index: #{index_name}, document: #{document_type}, #{attributes.map { |key,attr| "#{attr.name}: #{attr.type.type}"}.join(', ')}>"
+          end
         end
       end
     end
