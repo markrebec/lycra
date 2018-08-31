@@ -1,11 +1,4 @@
-class BaseSerializer
-  include Lycra::Attributes
-
-  # TODO Lycra::Serializer
-  def initialize(subject)
-    @_lycra_subject = subject
-  end
-
+class BaseSerializer < LycraSerializer
   attribute! :gid, types.integer, :id, 'Global ID of this object'
 end
 

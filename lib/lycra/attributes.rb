@@ -42,6 +42,10 @@ module Lycra
       def resolve!(obj, *args, **context)
         new(obj).resolve!(*args, **context)
       end
+
+      def inspect
+        "#{name}(#{attributes.map { |key,attr| "#{attr.name}: #{attr.type.type}"}.join(', ')})"
+      end
     end
 
     module InstanceMethods

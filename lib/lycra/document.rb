@@ -105,6 +105,10 @@ module Lycra
         def as_indexed_json(obj, options={})
           resolve!(obj).as_json(options)
         end
+
+        def inspect
+          "#{super}[#{index_name}/#{document_type}]"
+        end
       end
 
       module InstanceMethods

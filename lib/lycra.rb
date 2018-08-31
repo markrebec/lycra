@@ -8,7 +8,6 @@ require 'lycra/errors'
 require 'lycra/types'
 require 'lycra/attributes'
 require 'lycra/document'
-require 'lycra/document/base'
 require 'lycra/model'
 require 'lycra/search'
 require 'lycra/engine' if defined?(Rails)

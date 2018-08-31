@@ -1,4 +1,4 @@
-class BaseDocument < Lycra::Document::Base
+class BaseDocument < LycraDocument
   attribute! :gid, types.integer, :id, 'Global ID of this object'
 end
 
