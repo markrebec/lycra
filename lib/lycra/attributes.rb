@@ -63,7 +63,11 @@ module Lycra
       end
 
       def inspect
-        "#<#{self.class.name} #{attributes.map { |key,attr| "#{attr.name}: #{attr.resolve!(_lycra_subject).to_json}"}.join(', ')}>"
+        if @resolved
+          "#<#{self.class.name} #{@resolved.map { |key,attr| "#{key}: #{attr.to_json}"}.join(', ')}>"
+        else
+          "#<#{self.class.name} #{attributes.map { |key,attr| "#{attr.name}: #{attr.type.type}"}.join(', ')}>"
+        end
       end
     end
   end
