@@ -107,13 +107,17 @@ module Lycra
         end
 
         def inspect
-          "#{super}[#{index_name}/#{document_type}]"
+          "#{name}(index: #{index_name}, document: #{document_type}, #{attributes.map { |key,attr| "#{attr.name}: #{attr.type.type}"}.join(', ')})"
         end
       end
 
       module InstanceMethods
         def as_indexed_json(options={})
           resolve!.as_json(options)
+        end
+
+        def inspect
+          "#<#{self.class.name} index: #{index_name}, document: #{document_type}, #{attributes.map { |key,attr| "#{attr.name}: #{attr.resolve!(_lycra_subject).to_json}"}.join(', ')}>"
         end
       end
     end

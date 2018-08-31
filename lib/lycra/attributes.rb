@@ -55,6 +55,10 @@ module Lycra
           [ key, attr.resolve!(_lycra_subject, args, context) ]
         end.to_h
       end
+
+      def inspect
+        "#<#{self.class.name} #{attributes.map { |key,attr| "#{attr.name}: #{attr.resolve!(_lycra_subject).to_json}"}.join(', ')}>"
+      end
     end
   end
 end
