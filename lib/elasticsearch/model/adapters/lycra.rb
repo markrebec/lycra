@@ -102,11 +102,12 @@ module Elasticsearch
                 if model.respond_to?(:model_document)
                   # TODO model_document.as_indexed_json(model)
                 else
-                  begin
-                    "#{model.class.name}Document".constantize.as_indexed_json(model)
-                  rescue
+                  modoc = begin
+                    "#{model.class.name}Document".constantize
+                  rescue NameError => e
                     raise "Unable to locate a document class for the #{model.class.name} model"
                   end
+                  modoc.as_indexed_json(model)
                 end
               end
 
