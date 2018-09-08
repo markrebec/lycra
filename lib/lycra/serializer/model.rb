@@ -18,6 +18,8 @@ module Lycra
       end
 
       module InstanceMethods
+        delegate :serialize!, to: :serializer
+
         def reload
           @serializer = nil
           super
@@ -25,10 +27,6 @@ module Lycra
 
         def serializer
           @serializer ||= self.class.serializer.new(self)
-        end
-
-        def serialize!
-          serializer.resolve!
         end
       end
     end
