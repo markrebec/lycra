@@ -1,8 +1,4 @@
-class BaseDocument < LycraDocument
-  attribute! :gid, types.integer, :id, 'Global ID of this object'
-end
-
-class VehicleDocument < BaseDocument
+class VehicleDocument < ApplicationDocument
   #settings index: { number_of_shards: 1 }
   #mappings dynamic: 'false'
 

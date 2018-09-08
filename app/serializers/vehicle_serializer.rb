@@ -1,8 +1,4 @@
-class BaseSerializer < LycraSerializer
-  attribute! :gid, types.integer, :id, 'Global ID of this object'
-end
-
-class VehicleSerializer < BaseSerializer
+class VehicleSerializer < ApplicationSerializer
   #attribute! :id, types.integer, 'A unique identifier'
 
   attribute :slug,

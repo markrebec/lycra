@@ -8,8 +8,10 @@ require 'active_record'
 require 'lycra'
 
 Dir[File.join(File.dirname(__FILE__), "app/models/**/*.rb")].each { |f| require f }
-Dir[File.join(File.dirname(__FILE__), "app/documents/**/*.rb")].each { |f| require f }
+require File.join(File.dirname(__FILE__), "app/serializers/application_serializer.rb")
 Dir[File.join(File.dirname(__FILE__), "app/serializers/**/*.rb")].each { |f| require f }
+require File.join(File.dirname(__FILE__), "app/documents/application_document.rb")
+Dir[File.join(File.dirname(__FILE__), "app/documents/**/*.rb")].each { |f| require f }
 
 ActiveRecord::Base.establish_connection(
   YAML::load(File.open('config/database.yml'))['development']
