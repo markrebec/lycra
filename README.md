@@ -146,6 +146,8 @@ end
 * caching
 * solidify conventions around bang methods / better error handling and raising
 * chainable search classes and DSL
+* facets/helpers
+* decorator
 
 ```
 # returns results
