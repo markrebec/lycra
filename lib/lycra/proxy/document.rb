@@ -122,8 +122,8 @@ module Lycra
 
         # this is copying their (annoying) pattern
         class_eval do
-          include  ::Elasticsearch::Model::Indexing::ClassMethods
-          include  ::Elasticsearch::Model::Searching::ClassMethods
+          include ::Elasticsearch::Model::Indexing::ClassMethods
+          include ::Elasticsearch::Model::Searching::ClassMethods
         end
 
         def index_name(index=nil)
