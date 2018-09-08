@@ -191,6 +191,7 @@ module Lycra
 
       class InstanceProxy
         include Base
+        delegate :index_name, :document_type, :subject_type, to: :klass_proxy
 
         # this is copying their (annoying) pattern
         class_eval do
@@ -199,6 +200,10 @@ module Lycra
 
         def klass
           target.class
+        end
+
+        def klass_proxy
+          klass.__lycra__
         end
       end
     end
