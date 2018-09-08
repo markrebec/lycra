@@ -10,7 +10,8 @@ module Lycra
       base.send :delegate, :attributes, to: base
 
       base.class_eval do
-        attribute! :id, types.integer # TODO move to Lycra::Model::Document
+        # TODO only for activerecord models??
+        attribute! :id, types.integer
       end
     end
 

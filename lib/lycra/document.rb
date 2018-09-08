@@ -1,4 +1,4 @@
-require 'lycra/document/proxy'
+require 'lycra/proxy/document'
 
 module Lycra
   module Document
@@ -11,7 +11,7 @@ module Lycra
       base.send :include, Attributes
 
       # elasticsearch specific
-      base.send :include, Proxy
+      base.send :include, Proxy::Document
     end
 
     module ClassMethods

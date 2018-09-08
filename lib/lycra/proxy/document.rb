@@ -1,9 +1,9 @@
 require 'lycra/indexing'
 
 module Lycra
-  module Document
+  module Proxy
     # TODO separate out ModelDocumentProxy (model-backed) and DocumentProxy (generic serializer style documents)
-    module Proxy
+    module Document
       def self.included(base)
         base.send :extend,  ClassMethods
         base.send :include, InstanceMethods
@@ -120,7 +120,7 @@ module Lycra
       class ClassProxy
         include Base
 
-        # TODO this is copying their patter, but can't we just extend with these?
+        # this is copying their (annoying) pattern
         class_eval do
           include  ::Elasticsearch::Model::Indexing::ClassMethods
           include  ::Elasticsearch::Model::Searching::ClassMethods
@@ -170,7 +170,7 @@ module Lycra
       class InstanceProxy
         include Base
 
-        # TODO this is copying their patter, but can't we just extend with these?
+        # this is copying their (annoying) pattern
         class_eval do
           include ::Elasticsearch::Model::Indexing::InstanceMethods
         end
