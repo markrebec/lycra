@@ -29,6 +29,7 @@ module Lycra
       end
 
       def attribute(name=nil, type=nil, *args, **opts, &block)
+        opts = {cache: cache}.merge(opts)
         attr = Attribute.new(name, type, *args, **opts, &block)
         attributes[attr.name] = attr
       end
@@ -48,6 +49,11 @@ module Lycra
 
       def subject_type=(klass)
         subject_type klass
+      end
+
+      def cache(cache=nil)
+        @_lycra_cache = cache unless cache.nil?
+        @_lycra_cache
       end
 
       def resolve!(subj, *args, **context)

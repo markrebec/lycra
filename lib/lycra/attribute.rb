@@ -19,6 +19,7 @@ module Lycra
       @description = opts[:description] if opts.key?(:description)
 
       @required = opts[:required] || false
+      @cache = opts[:cache] || false
 
       instance_exec &block if block_given?
     end
@@ -58,17 +59,22 @@ module Lycra
       # and refresh if it changed?
       #return @resolved.transform unless @resolved.nil?
 
-      if resolver.is_a?(Proc)
-        result = resolver.call(subj, args, ctxt)
-      elsif resolver.is_a?(Symbol)
-        result = subj.send(resolver)
+      begin
+        # TODO wrap this whole block in cache if caching is enabled
+        if resolver.is_a?(Proc)
+          result = resolver.call(subj, args, ctxt)
+        elsif resolver.is_a?(Symbol)
+          result = subj.send(resolver)
+        end
+
+        @resolved = type.new(result)
+
+        raise Lycra::AttributeError, "Invalid value #{@resolved.value} (#{@resolved.value.class.name}) for type '#{@resolved.type}' in field #{name} on #{subj}" unless @resolved.valid?(@required)
+
+        @resolved.transform
+      rescue => e
+        raise e
       end
-
-      @resolved = type.new(result)
-
-      raise Lycra::AttributeError, "Invalid value #{@resolved.value} (#{@resolved.value.class.name}) for type '#{@resolved.type}' in field #{name} on #{subj}" unless @resolved.valid?(@required)
-
-      @resolved.transform
     end
 
     def as_json(opts={})
