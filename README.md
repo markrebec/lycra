@@ -140,3 +140,37 @@ class TruckDocument < VehicleDocument
   end
 end
 ```
+
+## TODO / IDEAS
+
+* `only`/`except` to include/exclude attributes
+* chainable search classes and DSL
+
+```
+# returns results
+Vehicle.search('car')
+Vehicle.search('car', filters: {published: true})
+Vehicle.search(filters: {published: true})
+
+# chainable
+Vehicle.search
+Vehicle.search.term('car')
+Vehicle.search.filter(published: true)
+
+# DSL
+Vehicle.search do
+  term 'car'
+  filter published: true
+end
+
+Vehicle.search do
+  term 'car' do
+    filters do
+      published true
+    end
+  end
+end
+
+# multi-index
+Lycra.search
+```
