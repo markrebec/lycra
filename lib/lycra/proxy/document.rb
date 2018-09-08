@@ -27,7 +27,7 @@ module Lycra
       end
 
       module ClassMethods
-        delegate :index_name, :document_type, :document_model, :import, :search, to: :__lycra__
+        delegate :index_name, :document_type, :subject_type, :import, :search, to: :__lycra__
 
         def inherited(child)
           super if defined?(super)
@@ -142,13 +142,13 @@ module Lycra
           document_type type
         end
 
-        def document_model(model=nil)
-          @_lycra_document_model = model if model
-          @_lycra_document_model ||= (target.name.gsub(/Document\Z/, '').constantize rescue nil)
+        def subject_type(model=nil)
+          @_lycra_subject_type = model if model
+          @_lycra_subject_type ||= (target.name.gsub(/Document\Z/, '').constantize rescue nil)
         end
 
-        def document_model=(model)
-          document_model model
+        def subject_type=(model)
+          subject_type model
         end
 
         def mapping(mapping=nil)

@@ -20,7 +20,7 @@ module Elasticsearch
           # Returns an `ActiveRecord::Relation` instance
           #
           def records
-            sql_records = klass.document_model.where(klass.document_model.primary_key => ids)
+            sql_records = klass.subject_type.where(klass.subject_type.primary_key => ids)
             sql_records = sql_records.includes(self.options[:includes]) if self.options[:includes]
 
             # Re-order records based on the order from Elasticsearch hits
@@ -87,7 +87,7 @@ module Elasticsearch
             named_scope = options.delete(:scope)
             preprocess = options.delete(:preprocess)
 
-            scope = document_model
+            scope = subject_type
             scope = scope.__send__(named_scope) if named_scope
             scope = scope.instance_exec(&query) if query
 

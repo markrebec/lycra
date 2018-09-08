@@ -17,7 +17,7 @@ module Lycra
     module ClassMethods
       # TODO only needed by Lycra::Model::Document
       def find(*args, &block)
-        new(document_model.find(*args, &block))
+        new(subject_type.find(*args, &block))
       end
     end
 
