@@ -90,6 +90,10 @@ module Lycra
         end.compact.to_h
       end
 
+      def resolved?
+        !!@resolved
+      end
+
       def reload
         @resolved = nil
         subject.send(:reload) if subject.respond_to?(:reload)
@@ -106,8 +110,8 @@ module Lycra
       end
 
       def inspect
-        if @resolved
-          "#<#{self.class.name} subject: #{subject.class}, #{@resolved.map { |key,attr| "#{key}: #{attr.to_json}"}.join(', ')}>"
+        if resolved?
+          "#<#{self.class.name} subject: #{subject.class}, #{attributes.map { |key,attr| "#{key}: #{resolved[key].try(:to_json) || attr.type.type}"}.join(', ')}>"
         else
           "#<#{self.class.name} subject: #{subject.class}, #{attributes.map { |key,attr| "#{attr.name}: #{attr.type.type}"}.join(', ')}>"
         end

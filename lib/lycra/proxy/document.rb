@@ -82,6 +82,10 @@ module Lycra
           !!indexed
         end
 
+        def _indexed?
+          !!@indexed
+        end
+
         def reload
           super if defined?(super)
           @indexed = nil
@@ -105,13 +109,8 @@ module Lycra
         end
 
         def inspect
-          if @resolved
-            "#<#{self.class.name} index: #{self.class.index_name}, document: #{self.class.document_type}, subject: #{self.class.subject_type}, #{resolved.map { |key,attr| "#{key}: #{attr.to_json}"}.join(', ')}>"
-          elsif @indexed
-            "#<#{self.class.name} index: #{self.class.index_name}, document: #{self.class.document_type}, subject: #{self.class.subject_type}, #{indexed.map { |key,attr| "#{key}: #{attr.to_json}"}.join(', ')}>"
-          else
-            "#<#{self.class.name} index: #{self.class.index_name}, document: #{self.class.document_type}, subject: #{self.class.subject_type}, #{attributes.map { |key,attr| "#{attr.name}: #{attr.type.type}"}.join(', ')}>"
-          end
+          attr_str = "#{attributes.map { |key,attr| "#{key}: #{(resolved? && resolved[key].try(:to_json)) || (_indexed? && indexed[key.to_s].try(:to_json)) || attr.type.type}"}.join(', ')}>"
+          "#<#{self.class.name} index: #{self.class.index_name}, document: #{self.class.document_type}, subject: #{self.class.subject_type}, #{attr_str}"
         end
       end
 
