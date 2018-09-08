@@ -108,6 +108,7 @@ module Lycra
 
       def reload
         @resolved = nil
+        attributes.values.each(&:reload)
         subject.send(:reload) if subject.respond_to?(:reload)
         self
       end

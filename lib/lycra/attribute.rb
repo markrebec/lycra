@@ -54,12 +54,7 @@ module Lycra
     end
 
     def resolve!(subj, *args, **ctxt)
-      # don't memoize for now because it doesn't pick up model changes
-      # TODO maybe compare the original value to @resolved if it exists
-      # and refresh if it changed?
-      #return @resolved.transform unless @resolved.nil?
-
-      begin
+      @resolved ||= begin
         # TODO wrap this whole block in cache if caching is enabled
         if resolver.is_a?(Proc)
           result = resolver.call(subj, args, ctxt)
@@ -67,14 +62,17 @@ module Lycra
           result = subj.send(resolver)
         end
 
-        @resolved = type.new(result)
+        rslvd = type.new(result)
 
-        raise Lycra::AttributeError, "Invalid value #{@resolved.value} (#{@resolved.value.class.name}) for type '#{@resolved.type}' in field #{name} on #{subj}" unless @resolved.valid?(@required)
+        raise Lycra::AttributeError, "Invalid value #{rslvd.value} (#{rslvd.value.class.name}) for type '#{rslvd.type}' in field #{name} on #{subj}" unless rslvd.valid?(@required)
 
-        @resolved.transform
-      rescue => e
-        raise e
+        rslvd.transform
       end
+    end
+
+    def reload
+      @resolved = nil
+      self
     end
 
     def as_json(opts={})
