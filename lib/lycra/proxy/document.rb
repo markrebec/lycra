@@ -1,6 +1,5 @@
 module Lycra
   module Proxy
-    # TODO separate out ModelDocumentProxy (model-backed) and DocumentProxy (generic serializer style documents)
     module Document
       def self.included(base)
         base.send :extend,  ClassMethods
@@ -27,7 +26,7 @@ module Lycra
       end
 
       module ClassMethods
-        delegate :index_name, :document_type, :subject_type, :import, :search, to: :__lycra__
+        delegate :index_name, :document_type, :import, :search, to: :__lycra__
 
         def inherited(child)
           super if defined?(super)
@@ -143,6 +142,7 @@ module Lycra
 
       class ClassProxy
         include Base
+        delegate :subject_type, to: :target
 
         # this is copying their (annoying) pattern
         class_eval do
@@ -168,15 +168,6 @@ module Lycra
           document_type type
         end
 
-        def subject_type(model=nil)
-          @subject_type = model if model
-          @subject_type ||= (target.name.gsub(/Document\Z/, '').constantize rescue nil)
-        end
-
-        def subject_type=(model)
-          subject_type model
-        end
-
         def mapping(mapping=nil)
           @_lycra_mapping = mapping if mapping
           { document_type.to_s.underscore.to_sym => (@_lycra_mapping || {}).merge({
@@ -193,7 +184,8 @@ module Lycra
 
       class InstanceProxy
         include Base
-        delegate :index_name, :document_type, :subject_type, to: :klass_proxy
+        delegate :index_name, :document_type, to: :klass_proxy
+        delegate :subject_type, to: :klass
 
         # this is copying their (annoying) pattern
         class_eval do

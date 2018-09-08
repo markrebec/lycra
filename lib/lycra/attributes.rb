@@ -41,16 +41,36 @@ module Lycra
         @_lycra_attributes ||= {}
       end
 
+      def subject_type(klass=nil)
+        @_lycra_subject_type = klass if klass
+        @_lycra_subject_type ||= (name.gsub(/(Document|Serializer)\Z/, '').constantize rescue nil)
+      end
+
+      def subject_type=(klass)
+        subject_type klass
+      end
+
       def resolve!(obj, *args, **context)
         new(obj).resolve!(*args, **context)
       end
 
+      def method_missing(meth, *args, &block)
+        return subject_type.send(meth, *args, &block) if subject_type && subject_type.respond_to?(meth)
+        super
+      end
+
+      def respond_to?(meth, priv=false)
+        (subject_type && subject_type.respond_to?(meth, priv)) || super
+      end
+
       def inspect
-        "#{name}(#{attributes.map { |key,attr| "#{attr.name}: #{attr.type.type}"}.join(', ')})"
+        "#{name}(subject: #{subject_type}, #{attributes.map { |key,attr| "#{attr.name}: #{attr.type.type}"}.join(', ')})"
       end
     end
 
     module InstanceMethods
+      delegate :subject_type, to: :class
+
       def resolve!(*args, **context)
         raise Lycra::MissingSubjectError.new(self) if subject.nil?
         @resolved = attributes.map do |key,attr|
@@ -74,9 +94,9 @@ module Lycra
 
       def inspect
         if @resolved
-          "#<#{self.class.name} #{@resolved.map { |key,attr| "#{key}: #{attr.to_json}"}.join(', ')}>"
+          "#<#{self.class.name} subject: #{subject.class}, #{@resolved.map { |key,attr| "#{key}: #{attr.to_json}"}.join(', ')}>"
         else
-          "#<#{self.class.name} #{attributes.map { |key,attr| "#{attr.name}: #{attr.type.type}"}.join(', ')}>"
+          "#<#{self.class.name} subject: #{subject.class}, #{attributes.map { |key,attr| "#{attr.name}: #{attr.type.type}"}.join(', ')}>"
         end
       end
     end
