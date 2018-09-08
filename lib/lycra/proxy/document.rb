@@ -47,8 +47,16 @@ module Lycra
           resolve!(obj).as_json(options)
         end
 
+        def as_json(options={})
+          { index: index_name,
+            document: document_type,
+            subject: subject_type.name }
+            .merge(attributes.map { |k,a| [a.name, a.type.type] }.to_h)
+            .as_json(options)
+        end
+
         def inspect
-          "#{name}(index: #{index_name}, document: #{document_type}, #{attributes.map { |key,attr| "#{attr.name}: #{attr.type.type}"}.join(', ')})"
+          "#{name}(index: #{index_name}, document: #{document_type}, subject: #{subject_type}, #{attributes.map { |key,attr| "#{attr.name}: #{attr.type.type}"}.join(', ')})"
         end
       end
 
@@ -79,13 +87,29 @@ module Lycra
           self
         end
 
+        def as_json(options={})
+          hash = { index: self.class.index_name,
+                   document: self.class.document_type,
+                   subject: self.class.subject_type.name }
+
+          if @resolved
+            hash.merge!(resolved.map { |k,a| [k, a.as_json] }.to_h)
+          elsif @indexed
+            hash.merge!(indexed.map { |k,a| [k, a.as_json] }.to_h)
+          else
+            hash.merge!(attributes.map { |k,a| [a.name, a.type.type] }.to_h)
+          end
+
+          hash.as_json(options)
+        end
+
         def inspect
           if @resolved
-            "#<#{self.class.name} index: #{self.class.index_name}, document: #{self.class.document_type}, #{resolved.map { |key,attr| "#{key}: #{attr.to_json}"}.join(', ')}>"
+            "#<#{self.class.name} index: #{self.class.index_name}, document: #{self.class.document_type}, subject: #{self.class.subject_type}, #{resolved.map { |key,attr| "#{key}: #{attr.to_json}"}.join(', ')}>"
           elsif @indexed
-            "#<#{self.class.name} index: #{self.class.index_name}, document: #{self.class.document_type}, #{indexed.map { |key,attr| "#{key}: #{attr.to_json}"}.join(', ')}>"
+            "#<#{self.class.name} index: #{self.class.index_name}, document: #{self.class.document_type}, subject: #{self.class.subject_type}, #{indexed.map { |key,attr| "#{key}: #{attr.to_json}"}.join(', ')}>"
           else
-            "#<#{self.class.name} index: #{self.class.index_name}, document: #{self.class.document_type}, #{attributes.map { |key,attr| "#{attr.name}: #{attr.type.type}"}.join(', ')}>"
+            "#<#{self.class.name} index: #{self.class.index_name}, document: #{self.class.document_type}, subject: #{self.class.subject_type}, #{attributes.map { |key,attr| "#{attr.name}: #{attr.type.type}"}.join(', ')}>"
           end
         end
       end
