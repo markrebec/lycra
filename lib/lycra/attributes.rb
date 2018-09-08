@@ -55,8 +55,16 @@ module Lycra
       end
 
       def method_missing(meth, *args, &block)
-        return subject_type.send(meth, *args, &block) if subject_type && subject_type.respond_to?(meth)
-        super
+        if subject_type && subject_type.respond_to?(meth)
+          result = subject_type.send(meth, *args, &block)
+
+          return new(result) if result.is_a?(subject_type)
+          return result.map { |r| new(r) } if result.is_a?(Enumerable) && result.first.is_a?(subject_type)
+
+          return result
+        else
+          super
+        end
       end
 
       def respond_to?(meth, priv=false)
