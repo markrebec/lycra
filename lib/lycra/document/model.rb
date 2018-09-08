@@ -7,7 +7,7 @@ module Lycra
       end
 
       module ClassMethods
-        delegate :index_name, :document_type, :import, :search, to: :document
+        delegate :__lycra__, :index_name, :document_type, :import, :search, to: :document
 
         def document(klass=nil)
           @_lycra_document = klass if klass
@@ -20,7 +20,7 @@ module Lycra
       end
 
       module InstanceMethods
-        delegate :as_indexed_json, :indexed, :indexed?, :index!, to: :document
+        delegate :__lycra__, :as_indexed_json, :indexed, :indexed?, :index!, to: :document
 
         def reload
           @document = nil
