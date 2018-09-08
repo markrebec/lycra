@@ -79,15 +79,20 @@ module Lycra
     module InstanceMethods
       delegate :subject_type, to: :class
 
-      def resolve!(*args, **context)
+      def resolve!(*args, **options)
         raise Lycra::MissingSubjectError.new(self) if subject.nil?
+        context = options.slice!(:only, :except)
+
         @resolved = attributes.map do |key,attr|
+          next if (options.key?(:only) && ![options[:only]].flatten.include?(key)) ||
+                  (options.key?(:except) && [options[:except]].flatten.include?(key))
           [ key, attr.resolve!(subject, args, context) ]
-        end.to_h
+        end.compact.to_h
       end
 
       def reload
         @resolved = nil
+        subject.send(:reload) if subject.respond_to?(:reload)
         self
       end
 

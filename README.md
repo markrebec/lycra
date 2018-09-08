@@ -143,7 +143,8 @@ end
 
 ## TODO / IDEAS
 
-* `only`/`except` to include/exclude attributes
+* caching
+* solidify conventions around bang methods / better error handling and raising
 * chainable search classes and DSL
 
 ```
