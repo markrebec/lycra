@@ -21,8 +21,8 @@ class VehicleDocument < ApplicationDocument
   attribute :summary, types.text do
     description 'The third description'
     mappings    ({index: 'not_analyzed'})
-    resolve     ->(obj, arg, ctx) do
-      "#{obj.name} #{obj.description}"
+    resolve     ->(subj, args, ctxt) do
+      "#{subj.name} #{subj.description}"
     end
   end
 end

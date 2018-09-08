@@ -52,21 +52,21 @@ module Lycra
       @required = true
     end
 
-    def resolve!(obj, *args, **ctx)
+    def resolve!(subj, *args, **ctxt)
       # don't memoize for now because it doesn't pick up model changes
       # TODO maybe compare the original value to @resolved if it exists
       # and refresh if it changed?
       #return @resolved.transform unless @resolved.nil?
 
       if resolver.is_a?(Proc)
-        result = resolver.call(obj, args, ctx)
+        result = resolver.call(subj, args, ctxt)
       elsif resolver.is_a?(Symbol)
-        result = obj.send(resolver)
+        result = subj.send(resolver)
       end
 
       @resolved = type.new(result)
 
-      raise Lycra::AttributeError, "Invalid value #{@resolved.value} (#{@resolved.value.class.name}) for type '#{@resolved.type}' in field #{name} on #{obj}" unless @resolved.valid?(@required)
+      raise Lycra::AttributeError, "Invalid value #{@resolved.value} (#{@resolved.value.class.name}) for type '#{@resolved.type}' in field #{name} on #{subj}" unless @resolved.valid?(@required)
 
       @resolved.transform
     end

@@ -50,8 +50,8 @@ module Lycra
         subject_type klass
       end
 
-      def resolve!(obj, *args, **context)
-        new(obj).resolve!(*args, **context)
+      def resolve!(subj, *args, **context)
+        new(subj).resolve!(*args, **context)
       end
 
       def method_missing(meth, *args, &block)

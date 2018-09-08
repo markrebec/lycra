@@ -42,8 +42,8 @@ module Lycra
           end
         end
 
-        def as_indexed_json(obj, options={})
-          resolve!(obj).as_json(options)
+        def as_indexed_json(subj, options={})
+          resolve!(subj).as_json(options)
         end
 
         def as_json(options={})
