@@ -63,6 +63,15 @@ module Lycra
         self
       end
 
+      def method_missing(meth, *args, &block)
+        return subject.send(meth, *args, &block) if subject && subject.respond_to?(meth)
+        super
+      end
+
+      def respond_to?(meth, priv=false)
+        (subject && subject.respond_to?(meth, priv)) || super
+      end
+
       def inspect
         if @resolved
           "#<#{self.class.name} #{@resolved.map { |key,attr| "#{key}: #{attr.to_json}"}.join(', ')}>"
