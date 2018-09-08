@@ -44,7 +44,7 @@ module Lycra
 
       def subject_type(klass=nil)
         @_lycra_subject_type = klass if klass
-        @_lycra_subject_type ||= (name.gsub(/(Document|Serializer)\Z/, '').constantize rescue nil)
+        @_lycra_subject_type ||= (name.gsub(/(Decorator|Document|Serializer)\Z/, '').constantize rescue nil)
       end
 
       def subject_type=(klass)

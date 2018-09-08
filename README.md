@@ -143,6 +143,8 @@ end
 
 ## TODO / IDEAS
 
+* move/define default initializers
+* Attribute#reload / memoize resolved
 * caching
 * solidify conventions around bang methods / better error handling and raising
 * chainable search classes and DSL

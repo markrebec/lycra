@@ -11,6 +11,7 @@ require 'lycra/serializer'
 require 'lycra/serializer/model'
 require 'lycra/document'
 require 'lycra/document/model'
+require 'lycra/decorator'
 require 'lycra/search'
 require 'lycra/engine' if defined?(Rails)
 
