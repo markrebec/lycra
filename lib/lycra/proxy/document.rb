@@ -1,5 +1,3 @@
-require 'lycra/indexing'
-
 module Lycra
   module Proxy
     # TODO separate out ModelDocumentProxy (model-backed) and DocumentProxy (generic serializer style documents)
