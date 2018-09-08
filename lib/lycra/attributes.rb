@@ -4,7 +4,7 @@ module Lycra
   module Attributes
     def self.included(base)
       base.send :attr_reader, :resolved
-      base.send :attr_accessor, :_lycra_subject
+      base.send :attr_accessor, :subject
       base.send :extend, ClassMethods
       base.send :include, InstanceMethods
       base.send :delegate, :attributes, to: base
@@ -52,9 +52,9 @@ module Lycra
 
     module InstanceMethods
       def resolve!(*args, **context)
-        raise Lycra::MissingSubjectError.new(self) if _lycra_subject.nil?
+        raise Lycra::MissingSubjectError.new(self) if subject.nil?
         @resolved = attributes.map do |key,attr|
-          [ key, attr.resolve!(_lycra_subject, args, context) ]
+          [ key, attr.resolve!(subject, args, context) ]
         end.to_h
       end
 

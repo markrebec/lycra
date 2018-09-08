@@ -6,9 +6,9 @@ module Lycra
       msg = "This document was initialized with a nil subject. "
 
       if document && document.is_a?(Lycra::Document::Base)
-        msg += "It looks like you're inheriting from the Lycra::Document::Base class, so make sure to pass an object when calling `#{document.class.name}.new` or `#{document.class.name}.resolve!`, and if you're overriding the initializer be sure to call `super` with the appropriate argument or set @_lycra_subject yourself."
+        msg += "It looks like you're inheriting from the Lycra::Document::Base class, so make sure to pass an object when calling `#{document.class.name}.new` or `#{document.class.name}.resolve!`, and if you're overriding the initializer be sure to call `super` with the appropriate argument or set @subject yourself."
       else
-        msg += "It looks like you're using the Lycra::Document mixin, make sure you set @_lycra_subject before resolving (i.e. in your class initializer)."
+        msg += "It looks like you're using the Lycra::Document mixin, make sure you set @subject before resolving (i.e. in your class initializer)."
       end
 
       super(msg)

@@ -23,12 +23,12 @@ module Lycra
 
     module InstanceMethods
       def method_missing(meth, *args, &block)
-        return _lycra_subject.send(meth, *args, &block) if _lycra_subject && _lycra_subject.respond_to?(meth)
+        return subject.send(meth, *args, &block) if subject && subject.respond_to?(meth)
         super
       end
 
       def respond_to?(meth, priv=false)
-        (_lycra_subject && _lycra_subject.respond_to?(meth, priv)) || super
+        (subject && subject.respond_to?(meth, priv)) || super
       end
     end
   end

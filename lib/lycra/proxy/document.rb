@@ -61,6 +61,8 @@ module Lycra
       end
 
       module InstanceMethods
+        delegate :index_name, :document_type, :subject_type, to: :class
+
         def as_indexed_json(options={})
           resolve!.as_json(options)
         end
@@ -70,7 +72,7 @@ module Lycra
         end
 
         def _indexed
-          @indexed ||= self.class.search({query: {terms: {id: [_lycra_subject.id]}}}).results.first
+          @indexed ||= self.class.search({query: {terms: {id: [subject.id]}}}).results.first
         end
 
         def indexed
@@ -167,8 +169,8 @@ module Lycra
         end
 
         def subject_type(model=nil)
-          @_lycra_subject_type = model if model
-          @_lycra_subject_type ||= (target.name.gsub(/Document\Z/, '').constantize rescue nil)
+          @subject_type = model if model
+          @subject_type ||= (target.name.gsub(/Document\Z/, '').constantize rescue nil)
         end
 
         def subject_type=(model)

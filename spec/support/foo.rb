@@ -16,7 +16,7 @@
     include Lycra::Document
 
     def initialize(*args, **opts, &block)
-      @_lycra_subject = args.first
+      @subject = args.first
     end
 
     document_type 'Thingamajig'
