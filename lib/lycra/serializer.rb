@@ -5,7 +5,9 @@ module Lycra
       base.send :alias_method, :serialize!, :resolve!
 
       base.class_eval do
-        alias_method :serialize!, :resolve!
+        class << self
+          alias_method :serialize!, :resolve!
+        end
       end
     end
   end

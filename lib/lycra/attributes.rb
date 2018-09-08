@@ -57,7 +57,13 @@ module Lycra
       end
 
       def resolve!(subj, *args, **context)
-        new(subj).resolve!(*args, **context)
+        if subj.is_a?(subject_type)
+          return new(subj).resolve!(*args, **context)
+        elsif subj.is_a?(Enumerable) && subj.first.is_a?(subject_type)
+          return subj.map { |s| resolve!(s, *args, **context) }
+        end
+
+        raise "Invalid subject: #{subj}"
       end
 
       def method_missing(meth, *args, &block)
