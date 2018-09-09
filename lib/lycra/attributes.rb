@@ -114,12 +114,13 @@ module Lycra
       end
 
       def method_missing(meth, *args, &block)
+        return attributes[meth].resolve!(subject, *args, &block) if attributes.key?(meth)
         return subject.send(meth, *args, &block) if subject && subject.respond_to?(meth)
         super
       end
 
       def respond_to?(meth, priv=false)
-        (subject && subject.respond_to?(meth, priv)) || super
+        attributes.key?(meth) || (subject && subject.respond_to?(meth, priv)) || super
       end
 
       def inspect

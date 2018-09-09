@@ -10,5 +10,9 @@ module Lycra
         end
       end
     end
+
+    def as_json(options={})
+      serialize!(subject).as_json(options)
+    end
   end
 end

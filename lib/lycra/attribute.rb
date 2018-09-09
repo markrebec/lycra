@@ -70,8 +70,12 @@ module Lycra
       end
     end
 
+    def resolved?
+      instance_variable_defined? :@resolved
+    end
+
     def reload
-      @resolved = nil
+      remove_instance_variable :@resolved
       self
     end
 
