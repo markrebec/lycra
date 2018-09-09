@@ -143,7 +143,6 @@ end
 
 ## TODO / IDEAS
 
-* move/define default initializers
 * caching
 * solidify conventions around bang methods / better error handling and raising
 * chainable search classes and DSL

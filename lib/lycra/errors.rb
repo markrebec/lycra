@@ -3,13 +3,7 @@ module Lycra
 
   class MissingSubjectError < StandardError
     def initialize(document=nil)
-      msg = "This document was initialized with a nil subject. "
-
-      if document && document.is_a?(Lycra::Document::Base)
-        msg += "It looks like you're inheriting from the Lycra::Document::Base class, so make sure to pass an object when calling `#{document.class.name}.new` or `#{document.class.name}.resolve!`, and if you're overriding the initializer be sure to call `super` with the appropriate argument or set @subject yourself."
-      else
-        msg += "It looks like you're using the Lycra::Document mixin, make sure you set @subject before resolving (i.e. in your class initializer)."
-      end
+      msg = "This document was initialized with a nil subject. Make sure you set @subject before resolving or call `super` from your initializer."
 
       super(msg)
     end
@@ -26,7 +20,9 @@ module Lycra
 You must define a corresponding document class for all models utilizing Lycra::Model. For example, if your model is called BlogPost:
 
   # /app/documents/blog_post_document.rb
-  class BlogPostDocument < Lycra::Document
+  class BlogPostDocument
+    include Lycra::Document
+
     index_name 'blog-posts'
   end
 MSG
@@ -34,8 +30,10 @@ MSG
         msg = <<MSG
 You must define a corresponding document class for your #{model.name} model. For example:
 
-  # /app/documents/#{model.name.split('::').map { |n| n.underscore }.join('/')}_document.rb
-  class #{model.name}Document < Lycra::Document
+  # /app/documents/#{model.name.underscore}_document.rb
+  class #{model.name}Document
+    include Lycra::Document
+
     index_name '#{model.name.parameterize.pluralize}'
   end
 MSG

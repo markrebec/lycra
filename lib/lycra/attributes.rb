@@ -91,6 +91,10 @@ module Lycra
     module InstanceMethods
       delegate :subject_type, to: :class
 
+      def initialize(subject)
+        @subject = subject
+      end
+
       def resolve!(*args, **options)
         raise Lycra::MissingSubjectError.new(self) if subject.nil?
         context = options.slice!(:only, :except)
