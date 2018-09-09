@@ -144,6 +144,7 @@ end
 ## TODO / IDEAS
 
 * import scope
+* merge document+proxy
 * caching
 * solidify conventions around bang methods / better error handling and raising
 * chainable search classes and DSL
