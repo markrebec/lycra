@@ -1,8 +1,8 @@
 module Lycra
   module Version
-    MAJOR = '0'
+    MAJOR = '5'
     MINOR = '0'
-    PATCH = '7'
+    PATCH = '0'
     VERSION = "#{MAJOR}.#{MINOR}.#{PATCH}"
 
     class << self
