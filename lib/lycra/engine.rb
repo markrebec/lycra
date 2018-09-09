@@ -10,7 +10,6 @@ module Lycra
 
     initializer "lycra.elasticsearch.client" do |app|
       Elasticsearch::Model.client = Lycra.client
-      Elasticsearch::Persistence.client = Lycra.client
     end
   end
 end
