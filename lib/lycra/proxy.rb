@@ -99,7 +99,7 @@ module Lycra
           document: self.class.document_type,
           subject: self.class.subject_type.name,
           resolved: resolved.map { |k,a| [k, a.as_json] }.to_h,
-          indexed: indexed.map { |k,a| [k, a.as_json] }.to_h }
+          indexed: indexed? && indexed.map { |k,a| [k, a.as_json] }.to_h }
           .as_json(options)
       end
 

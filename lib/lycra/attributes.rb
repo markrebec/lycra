@@ -102,7 +102,7 @@ module Lycra
         @resolved = attributes.map do |key,attr|
           next if (options.key?(:only) && ![options[:only]].flatten.include?(key)) ||
                   (options.key?(:except) && [options[:except]].flatten.include?(key))
-          [ key, attr.resolve!(subject, args, context) ]
+          [ key, attr.dup.resolve!(subject, args, context) ]
         end.compact.to_h
       end
 
