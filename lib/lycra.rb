@@ -1,6 +1,5 @@
 require 'logger'
 require 'canfig'
-require 'elasticsearch/persistence'
 require 'elasticsearch/model'
 require 'elasticsearch/model/adapters/lycra'
 #require 'lycra/monkeypatches' # TODO still need this?
