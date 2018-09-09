@@ -74,7 +74,7 @@ module Lycra
     end
 
     class Boolean < Type
-      def self.valid?(value)
+      def self.valid?(value, required=false)
         [true, false, 0, 1, nil].include?(value)
       end
 
@@ -92,7 +92,7 @@ module Lycra
     class Object < Type
       klasses ::Hash
 
-      def self.valid?(value)
+      def self.valid?(value, required=false)
         return true if super(value)
         value.respond_to?(:to_h)
       end
@@ -103,7 +103,7 @@ module Lycra
     end
 
     class Nested < Type
-      def self.valid?(value)
+      def self.valid?(value, required=false)
         return true if value.nil?
         value.respond_to?(:each)
       end
