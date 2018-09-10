@@ -25,13 +25,14 @@ module Lycra
     end
 
     module ClassMethods
-      delegate :index_name, :document_type, :import, :search, to: :__lycra__
+      delegate :index_name, :document_type, :search, to: :__lycra__
 
       def inherited(child)
         super if defined?(super)
 
         # resets the proxy so it gets recreated for the new class
         child.send :instance_variable_set, :@__lycra__, nil
+        child.send :instance_variable_set, :@_lycra_import_scope, self.import_scope
 
         child.class_eval do
           self.__lycra__.class_eval do
@@ -39,6 +40,25 @@ module Lycra
             include  ::Elasticsearch::Model::Adapter.from_class(child).importing_mixin
           end
         end
+      end
+
+      def import_scope(scope=nil, &block)
+        @_lycra_import_scope = scope if scope
+        @_lycra_import_scope = block if block_given?
+        @_lycra_import_scope
+      end
+
+      def import_scope=(scope)
+        import_scope scope
+      end
+
+      def import(*args, **opts, &block)
+        scope_hash = {}
+        scope_hash[:scope] = import_scope if import_scope.is_a?(String) || import_scope.is_a?(Symbol)
+        scope_hash[:query] = import_scope if import_scope.is_a?(Proc)
+        opts = scope_hash.merge(opts)
+
+        __lycra__.import(*args, **opts, &block)
       end
 
       def as_indexed_json(subj, options={})

@@ -42,7 +42,7 @@ module Lycra
     end
 
     class Text < Type
-      klasses ::String
+      klasses ::String, ::Enumerable
     end
 
     def self.text
