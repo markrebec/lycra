@@ -3,24 +3,27 @@ module Lycra
     class Type
       attr_reader :value
 
-      def self.klasses(*klasses)
-        @_klasses = klasses unless klasses.empty?
-        @_klasses || []
-      end
+      class << self
+        def klasses(*klasses)
+          @_klasses = klasses unless klasses.empty?
+          @_klasses || []
+        end
 
-      def self.type(type=nil)
-        @_type = type if type
-        @_type ||= self.name.demodulize.underscore
-      end
+        def type(type=nil)
+          @_type = type if type
+          @_type ||= self.name.demodulize.underscore
+        end
+        alias_method :to_s, :type
 
-      def self.valid?(value, required=false)
-        return false if required && value.nil?
-        return true  if value.nil?
-        klasses.any? { |klass| value.is_a?(klass) }
-      end
+        def valid?(value, required=false)
+          return false if required && value.nil?
+          return true  if value.nil?
+          klasses.any? { |klass| value.is_a?(klass) }
+        end
 
-      def self.transform(value)
-        value # noop by default
+        def self.transform(value)
+          value # noop by default
+        end
       end
 
       def initialize(value)
