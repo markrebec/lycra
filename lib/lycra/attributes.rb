@@ -1,4 +1,5 @@
-require 'lycra/attribute'
+require 'lycra/attributes/collection'
+require 'lycra/attributes/attribute'
 
 module Lycra
   module Attributes
@@ -39,7 +40,7 @@ module Lycra
       end
 
       def attributes
-        @_lycra_attributes ||= {}
+        @_lycra_attributes ||= Collection.new
       end
 
       def subject_type(klass=nil)

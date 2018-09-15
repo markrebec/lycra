@@ -10,7 +10,10 @@ Gem::Specification.new do |s|
   s.email       = ["mark@markrebec.com"]
   s.homepage    = "http://github.com/markrebec/lycra"
 
-  s.files       = Dir["lib/lycra.rb", "lib/lycra/**/*"]
+  s.files       = Dir[ "lib/lycra.rb",
+                       "lib/lycra/**/*",
+                       "lib/elasticsearch/**/*",
+                       "lib/awesome_print/**/*" ]
   s.test_files  = Dir["spec/**/*"]
 
   s.add_dependency "canfig"

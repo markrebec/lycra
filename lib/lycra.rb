@@ -12,6 +12,7 @@ require 'lycra/document'
 require 'lycra/document/model'
 require 'lycra/decorator'
 require 'lycra/search'
+require 'awesome_print/ext/lycra_attributes' if defined?(AwesomePrint)
 require 'lycra/engine' if defined?(Rails)
 
 module Lycra

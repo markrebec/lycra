@@ -79,7 +79,7 @@ module Lycra
       self
     end
 
-    def as_json(opts={})
+    def as_json(options={})
       {
         name: name,
         type: type.type,
