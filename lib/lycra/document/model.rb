@@ -27,7 +27,8 @@ module Lycra
           super
         end
 
-        def document
+        def document(document_class=nil)
+          return document_class.new(self) if document_class
           @document ||= self.class.document.new(self)
         end
       end

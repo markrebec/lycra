@@ -25,7 +25,8 @@ module Lycra
           super
         end
 
-        def serializer
+        def serializer(serializer_class=nil)
+          return serializer_class.new(self) if serializer_class
           @serializer ||= self.class.serializer.new(self)
         end
       end
