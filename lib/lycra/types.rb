@@ -21,7 +21,7 @@ module Lycra
           klasses.any? { |klass| value.is_a?(klass) }
         end
 
-        def self.transform(value)
+        def transform(value)
           value # noop by default
         end
       end
