@@ -12,11 +12,11 @@ module AwesomePrint
       def format
         padding = attributes.keys.map { |k| k.to_s.length }.max
         attrs = attributes.values.map do |attr|
-          inspector.awesome(attr)
+          LycraAttributeFormatter.new(attr, inspector, padding: padding).format
         end
 
         if options[:multiline]
-          "#{attributes.to_s} {\n#{attrs.join("\n")}\n}"
+          "#{attributes.to_s} {\n#{attrs.join("\n")}\n#{outdent}}"
         else
           "#{attributes.to_s} { #{attrs.join(", ")} }"
         end
