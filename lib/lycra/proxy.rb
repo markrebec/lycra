@@ -91,7 +91,7 @@ module Lycra
       end
 
       def _indexed
-        @indexed ||= self.class.search({query: {terms: {id: [subject.id]}}}).results.first
+        @indexed ||= self.class.search({query: {terms: {_id: [subject.id]}}}).results.first
       end
 
       def indexed
