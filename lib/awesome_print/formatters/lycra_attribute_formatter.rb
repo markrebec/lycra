@@ -28,7 +28,10 @@ module AwesomePrint
 
         def name_and_type
           name = align(attribute.name.to_s, indentation + padding)
-          "#{attribute.required ? name.green : name.cyan} #{attribute.type.type.blue} #{resolver.yellowish}"
+          name = attribute.required? ? name.green : name.cyan
+          type = attribute.type.type
+          type = attribute.nested? ? "array[#{type}]" : "#{type}"
+          "#{name} #{type.blue} #{resolver.yellowish}"
         end
 
         def description
@@ -36,7 +39,7 @@ module AwesomePrint
         end
 
         def resolver
-          attribute.resolver.is_a?(Symbol) ? "method" : "proc"
+          attribute.resolver.is_a?(Symbol) ? "#{attribute.klass.name}##{attribute.resolver.to_s}" : attribute.resolver.to_s
         end
 
         def mappings

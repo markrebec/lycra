@@ -21,7 +21,13 @@ module Lycra
         super if defined?(super)
 
         # This clones parent attribues down to inheriting child classes
-        child.send :instance_variable_set, :@_lycra_attributes, Collection.new(child, self.attributes.attributes.dup)
+        child.send :instance_variable_set,
+                   :@_lycra_attributes,
+                   Collection.new(child, self.attributes.map { |k,attr|
+                     duped = attr.dup
+                     duped.instance_variable_set(:@klass, child)
+                     [k, duped]
+                   }.to_h)
         child.send :delegate, :attributes, to: child
       end
 
@@ -31,7 +37,7 @@ module Lycra
 
       def attribute(name=nil, type=nil, *args, **opts, &block)
         opts = {cache: cache}.merge(opts)
-        attr = Attribute.new(name, type, *args, **opts, &block)
+        attr = Attribute.new(name, type, *args, **opts.merge({klass: self}), &block)
         attributes[attr.name] = attr
       end
 
@@ -85,7 +91,7 @@ module Lycra
       end
 
       def inspect
-        "#{name}(subject: #{subject_type}, #{attributes.map { |key,attr| "#{attr.name}: #{attr.type.type}"}.join(', ')})"
+        "#{name}(subject: #{subject_type}, #{attributes.map { |key,attr| "#{attr.name}: #{attr.nested? ? "[#{attr.type.type}]" : attr.type.type}"}.join(', ')})"
       end
     end
 
@@ -130,9 +136,9 @@ module Lycra
 
       def inspect
         if resolved?
-          "#<#{self.class.name} subject: #{subject.class}, #{attributes.map { |key,attr| "#{key}: #{resolved[key].try(:to_json) || attr.type.type}"}.join(', ')}>"
+          "#<#{self.class.name} subject: #{subject.class}, #{attributes.map { |key,attr| "#{key}: #{resolved[key].try(:to_json) || (attr.nested? ? "[#{attr.type.type}]" : attr.type.type)}"}.join(', ')}>"
         else
-          "#<#{self.class.name} subject: #{subject.class}, #{attributes.map { |key,attr| "#{attr.name}: #{attr.type.type}"}.join(', ')}>"
+          "#<#{self.class.name} subject: #{subject.class}, #{attributes.map { |key,attr| "#{attr.name}: #{attr.nested? ? "[#{attr.type.type}]" : attr.type.type}"}.join(', ')}>"
         end
       end
     end

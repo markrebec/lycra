@@ -74,7 +74,7 @@ module Lycra
       end
 
       def inspect
-        "#{name}(index: #{index_name}, document: #{document_type}, subject: #{subject_type}, #{attributes.map { |key,attr| "#{attr.name}: #{attr.type.type}"}.join(', ')})"
+        "#{name}(index: #{index_name}, document: #{document_type}, subject: #{subject_type}, #{attributes.map { |key,attr| "#{attr.name}: #{attr.nested? ? "[#{attr.type.type}]" : attr.type.type}"}.join(', ')})"
       end
     end
 
@@ -124,7 +124,7 @@ module Lycra
       end
 
       def inspect
-        attr_str = "#{attributes.map { |key,attr| "#{key}: #{(resolved? && resolved[key].try(:to_json)) || (_indexed? && indexed[key.to_s].try(:to_json)) || attr.type.type}"}.join(', ')}>"
+        attr_str = "#{attributes.map { |key,attr| "#{key}: #{(resolved? && resolved[key].try(:to_json)) || (_indexed? && indexed[key.to_s].try(:to_json)) || (attr.nested? ? "[#{attr.type.type}]" : attr.type.type)}"}.join(', ')}>"
         "#<#{self.class.name} index: #{self.class.index_name}, document: #{self.class.document_type}, subject: #{self.class.subject_type}, #{attr_str}"
       end
     end

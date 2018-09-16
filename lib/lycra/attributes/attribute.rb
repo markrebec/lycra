@@ -1,7 +1,7 @@
 module Lycra
   module Attributes
     class Attribute
-      attr_reader :resolved, :required
+      attr_reader :resolved, :required, :klass
 
       def initialize(name=nil, type=nil, *args, **opts, &block)
         @name = name
@@ -10,6 +10,8 @@ module Lycra
         @nested_type = type.is_a?(Array)
         @type = [type].flatten.compact.first
         @type ||= [opts[:type]].flatten.compact.first
+
+        @klass = opts[:klass]
 
         @mappings = opts[:mappings] || opts[:mapping]
 
