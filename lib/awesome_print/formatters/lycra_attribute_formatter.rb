@@ -2,6 +2,10 @@ module AwesomePrint
   module Formatters
     class LycraAttributeFormatter < BaseFormatter
       attr_reader :attribute, :inspector, :options, :padding
+      # TODO dynamic padding based on key length (maybe squash this back into
+      # the collection class)
+      # TODO mappings (maybe refactor attribute(s) to accept the document and
+      # behave differently if they're a document attribute or not)
 
       def initialize(attribute, inspector, padding: 11)
         @attribute = attribute

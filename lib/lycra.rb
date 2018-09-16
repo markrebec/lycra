@@ -13,12 +13,7 @@ require 'lycra/document/model'
 require 'lycra/decorator'
 require 'lycra/search'
 require 'lycra/engine' if defined?(Rails)
-if defined?(AwesomePrint)
-  require 'awesome_print/formatters/lycra_attribute_formatter'
-  require 'awesome_print/formatters/lycra_attributes_formatter'
-  require 'awesome_print/ext/lycra_attribute'
-  require 'awesome_print/ext/lycra_attributes'
-end
+require 'lycra/awesome_print' if defined?(AwesomePrint)
 
 module Lycra
   include Canfig::Module
