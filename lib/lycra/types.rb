@@ -19,6 +19,7 @@ module Lycra
           return false if required && value.nil?
           return true  if value.nil?
           return false if nested && !value.is_a?(Enumerable)
+          return true  if nested && value.empty?
           if nested
             klasses.any? { |klass| value.all? { |val| val.is_a?(klass) } }
           else

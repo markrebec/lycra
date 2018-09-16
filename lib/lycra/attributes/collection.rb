@@ -5,8 +5,9 @@ module Lycra
 
       attr_reader :attributes
 
-      def initialize
-        @attributes = {}
+      def initialize(klass, attributes={})
+        @klass = klass
+        @attributes = attributes
       end
 
       def each(&block)

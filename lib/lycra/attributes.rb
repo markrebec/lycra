@@ -21,7 +21,7 @@ module Lycra
         super if defined?(super)
 
         # This clones parent attribues down to inheriting child classes
-        child.send :instance_variable_set, :@_lycra_attributes, self.attributes.try(:dup)
+        child.send :instance_variable_set, :@_lycra_attributes, Collection.new(child, self.attributes.attributes.dup)
         child.send :delegate, :attributes, to: child
       end
 
@@ -40,7 +40,7 @@ module Lycra
       end
 
       def attributes
-        @_lycra_attributes ||= Collection.new
+        @_lycra_attributes ||= Collection.new(self)
       end
 
       def subject_type(klass=nil)
