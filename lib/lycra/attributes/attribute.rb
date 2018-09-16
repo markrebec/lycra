@@ -7,8 +7,9 @@ module Lycra
         @name = name
         @name ||= opts[:name]
 
-        @type = type
-        @type ||= opts[:type]
+        @nested_type = type.is_a?(Array)
+        @type = [type].flatten.compact.first
+        @type ||= [opts[:type]].flatten.compact.first
 
         @mappings = opts[:mappings] || opts[:mapping]
 
@@ -31,8 +32,15 @@ module Lycra
       end
 
       def type(type=nil)
-        @type = type if type
+        if type
+          @nested_type = type.is_a?(Array)
+          @type = [type].flatten.compact.first
+        end
         @type
+      end
+
+      def nested?
+        !!@nested_type
       end
 
       def mappings(mappings=nil)
@@ -54,6 +62,10 @@ module Lycra
         @required = true
       end
 
+      def required?
+        !!@required
+      end
+
       def resolve!(subj, *args, **ctxt)
         @resolved ||= begin
           # TODO wrap this whole block in cache if caching is enabled
@@ -65,7 +77,13 @@ module Lycra
 
           rslvd = type.new(result)
 
-          raise Lycra::AttributeError, "Invalid value #{rslvd.value} (#{rslvd.value.class.name}) for type '#{rslvd.type}' in field #{name} on #{subj}" unless rslvd.valid?(@required)
+          unless rslvd.valid?(required?, nested?)
+            rslvd_type = rslvd.type
+            rslvd_type = "array[#{rslvd.type}]" if nested?
+            raise Lycra::AttributeError,
+              "Invalid value #{rslvd.value} (#{rslvd.value.class.name}) " +
+              "for type '#{rslvd_type}' in field #{name} on #{subj}"
+          end
 
           rslvd.transform
         end

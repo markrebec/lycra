@@ -15,10 +15,15 @@ module Lycra
         end
         alias_method :to_s, :type
 
-        def valid?(value, required=false)
+        def valid?(value, required=false, nested=false)
           return false if required && value.nil?
           return true  if value.nil?
-          klasses.any? { |klass| value.is_a?(klass) }
+          return false if nested && !value.is_a?(Enumerable)
+          if nested
+            klasses.any? { |klass| value.all? { |val| val.is_a?(klass) } }
+          else
+            klasses.any? { |klass| value.is_a?(klass) }
+          end
         end
 
         def transform(value)
@@ -35,8 +40,8 @@ module Lycra
         @type ||= self.class.type
       end
 
-      def valid?(required=false)
-        @valid ||= self.class.valid?(@value, required)
+      def valid?(required=false, nested=false)
+        @valid ||= self.class.valid?(@value, required, nested)
       end
 
       def transform
@@ -45,7 +50,7 @@ module Lycra
     end
 
     class Text < Type
-      klasses ::String, ::Enumerable
+      klasses ::String
     end
 
     def self.text
@@ -77,7 +82,7 @@ module Lycra
     end
 
     class Boolean < Type
-      def self.valid?(value, required=false)
+      def self.valid?(value, required=false, nested=false)
         [true, false, 0, 1, nil].include?(value)
       end
 
@@ -95,8 +100,8 @@ module Lycra
     class Object < Type
       klasses ::Hash
 
-      def self.valid?(value, required=false)
-        return true if super(value)
+      def self.valid?(value, required=false, nested=false)
+        return true if super(value, required, nested)
         value.respond_to?(:to_h)
       end
     end
@@ -106,7 +111,7 @@ module Lycra
     end
 
     class Nested < Type
-      def self.valid?(value, required=false)
+      def self.valid?(value, required=false, nested=false)
         return true if value.nil?
         value.respond_to?(:each)
       end

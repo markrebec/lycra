@@ -25,4 +25,10 @@ class VehicleDocument < ApplicationDocument
       "#{subj.name} #{subj.description}"
     end
   end
+
+  attribute :texts, [types.text] do
+    resolve ->(subj, args, ctxt) do
+      [subj.slug, subj.name, subj.description]
+    end
+  end
 end
