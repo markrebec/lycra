@@ -149,7 +149,7 @@ module Lycra
         super
       end
 
-      def respond_to?(meth, priv=false)
+      def respond_to_missing?(meth, priv=false)
         target.respond_to?(meth, priv) || super
       end
     end

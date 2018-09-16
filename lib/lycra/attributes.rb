@@ -80,7 +80,7 @@ module Lycra
         end
       end
 
-      def respond_to?(meth, priv=false)
+      def respond_to_missing?(meth, priv=false)
         (subject_type && subject_type.respond_to?(meth, priv)) || super
       end
 
@@ -124,7 +124,7 @@ module Lycra
         super
       end
 
-      def respond_to?(meth, priv=false)
+      def respond_to_missing?(meth, priv=false)
         attributes.key?(meth) || (subject && subject.respond_to?(meth, priv)) || super
       end
 
