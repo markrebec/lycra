@@ -79,7 +79,7 @@ module Lycra
     end
 
     module InstanceMethods
-      delegate :index_name, :document_type, :subject_type, to: :class
+      delegate :index_name, :document_type, to: :class
 
       def as_indexed_json(options={})
         resolve!.as_json(options)
