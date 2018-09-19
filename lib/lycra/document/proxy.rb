@@ -54,6 +54,8 @@ module Lycra
         end
 
         def import(*args, **opts, &block)
+          raise Lycra::AbstractClassError, "Cannot import using an abstract class" if abstract?
+
           scope_hash = {}
           scope_hash[:scope] = import_scope if import_scope.is_a?(String) || import_scope.is_a?(Symbol)
           scope_hash[:query] = import_scope if import_scope.is_a?(Proc)
@@ -87,6 +89,8 @@ module Lycra
         end
 
         def index!
+          raise Lycra::AbstractClassError, "Cannot index using an abstract class" if abstract?
+
           @indexed = nil
           __lycra__.index_document
         end
@@ -194,6 +198,26 @@ module Lycra
         def settings(settings=nil)
           @_lycra_settings = settings if settings
           @_lycra_settings || {}
+        end
+
+        def create_index!(options={})
+          raise Lycra::AbstractClassError, "Cannot create using an abstract class" if abstract?
+          super
+        end
+
+        def delete_index!(options={})
+          raise Lycra::AbstractClassError, "Cannot delete using an abstract class" if abstract?
+          super
+        end
+
+        def refresh_index!(options={})
+          raise Lycra::AbstractClassError, "Cannot refresh using an abstract class" if abstract?
+          super
+        end
+
+        def import(options={}, &block)
+          raise Lycra::AbstractClassError, "Cannot import using an abstract class" if abstract?
+          super
         end
       end
 

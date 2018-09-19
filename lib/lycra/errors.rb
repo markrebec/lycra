@@ -1,5 +1,6 @@
 module Lycra
   class AttributeError < StandardError; end
+  class AbstractClassError < StandardError; end
 
   class MissingSubjectError < StandardError
     def initialize(document=nil)
