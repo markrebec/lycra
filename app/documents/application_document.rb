@@ -1,6 +1,7 @@
 class ApplicationDocument
   include Lycra::Document
 
-  attribute! :gid, types.integer, :id, 'Global ID of this object'
+  abstract!
 
+  attribute! :gid, types.integer, :id, 'Global ID of this object'
 end
