@@ -8,7 +8,7 @@ module Elasticsearch
       module LycraProxy
 
         Adapter.register self,
-                         lambda { |klass| !!defined?(::Lycra::Proxy) && klass.respond_to?(:ancestors) && klass.ancestors.include?(::Lycra::Proxy) }
+                         lambda { |klass| !!defined?(::Lycra::Document::Proxy) && klass.respond_to?(:ancestors) && klass.ancestors.include?(::Lycra::Document::Proxy) }
 
         module Records
           attr_writer :options
