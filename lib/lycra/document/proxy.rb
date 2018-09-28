@@ -26,7 +26,7 @@ module Lycra
       end
 
       module ClassMethods
-        delegate :index_name, :document_type, :search, to: :__lycra__
+        delegate :index_name, :document_type, :create_index!, :delete_index!, :import, :search, to: :__lycra__
 
         def inherited(child)
           super if defined?(super)
@@ -51,17 +51,6 @@ module Lycra
 
         def import_scope=(scope)
           import_scope scope
-        end
-
-        def import(*args, **opts, &block)
-          raise Lycra::AbstractClassError, "Cannot import using an abstract class" if abstract?
-
-          scope_hash = {}
-          scope_hash[:scope] = import_scope if import_scope.is_a?(String) || import_scope.is_a?(Symbol)
-          scope_hash[:query] = import_scope if import_scope.is_a?(Proc)
-          opts = scope_hash.merge(opts)
-
-          __lycra__.import(*args, **opts, &block)
         end
 
         def as_indexed_json(subj, options={})
@@ -161,7 +150,7 @@ module Lycra
 
       class ClassProxy
         include BaseProxy
-        delegate :subject_type, to: :target
+        delegate :subject_type, :import_scope, to: :target
 
         # this is copying their (annoying) pattern
         class_eval do
@@ -217,7 +206,13 @@ module Lycra
 
         def import(options={}, &block)
           raise Lycra::AbstractClassError, "Cannot import using an abstract class" if abstract?
-          super
+
+          scope_hash = {}
+          scope_hash[:scope] = import_scope if import_scope.is_a?(String) || import_scope.is_a?(Symbol)
+          scope_hash[:query] = import_scope if import_scope.is_a?(Proc)
+          options = scope_hash.merge(options)
+
+          super(*args, **options, &block)
         end
       end
 
