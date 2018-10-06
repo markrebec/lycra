@@ -74,13 +74,17 @@ module Lycra
         !!@required
       end
 
-      def resolve!(subj, *args, **ctxt)
+      def resolve!(document, *args, **ctxt)
         @resolved ||= begin
           # TODO wrap this whole block in cache if caching is enabled
           if resolver.is_a?(Proc)
-            result = resolver.call(subj, args, ctxt)
+            result = resolver.call(document.subject, args, ctxt)
           elsif resolver.is_a?(Symbol)
-            result = subj.send(resolver)
+            if document.methods.include?(resolver)
+              result = document.send(resolver)
+            else
+              result = document.subject.send(resolver)
+            end
           end
 
           rslvd = type.new(result)
@@ -90,7 +94,7 @@ module Lycra
             rslvd_type = "array[#{rslvd.type}]" if nested?
             raise Lycra::AttributeError,
               "Invalid value #{rslvd.value} (#{rslvd.value.class.name}) " +
-              "for type '#{rslvd_type}' in field #{name} on #{subj}"
+              "for type '#{rslvd_type}' in field #{name} on #{document}"
           end
 
           rslvd.transform

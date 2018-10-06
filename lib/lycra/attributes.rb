@@ -109,7 +109,7 @@ module Lycra
         @resolved = attributes.map do |key,attr|
           next if (options.key?(:only) && ![options[:only]].flatten.include?(key)) ||
                   (options.key?(:except) && [options[:except]].flatten.include?(key))
-          [ key, attr.dup.resolve!(subject, args, context) ]
+          [ key, attr.dup.resolve!(self, args, context) ]
         end.compact.to_h
       end
 
@@ -125,7 +125,7 @@ module Lycra
       end
 
       def method_missing(meth, *args, &block)
-        return attributes[meth].resolve!(subject, *args, &block) if attributes.key?(meth)
+        return attributes[meth].resolve!(self, *args, &block) if attributes.key?(meth)
         return subject.send(meth, *args, &block) if subject && subject.respond_to?(meth)
         super
       end
