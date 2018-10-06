@@ -121,5 +121,21 @@ module Lycra
     def self.nested
       Nested
     end
+
+    def self.custom(type)
+      Class.new(Type) do
+        self.type(type)
+
+        def self.valid?(value, required=false, nested=false)
+          return true if !required && !value
+          value.is_a?(type) || value.is_a?(type.subject_type)
+        end
+
+        def self.transform(value)
+          return value.resolve! if value.is_a?(type)
+          type.new(value).resolve!
+        end
+      end
+    end
   end
 end

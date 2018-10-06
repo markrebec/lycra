@@ -10,6 +10,9 @@ module Lycra
         @nested_type = type.is_a?(Array)
         @type = [type].flatten.compact.first
         @type ||= [opts[:type]].flatten.compact.first
+        if @type.ancestors.include?(Lycra::Attributes)
+          @type = Lycra::Types.custom(@type)
+        end
 
         @klass = opts[:klass]
 
@@ -37,6 +40,9 @@ module Lycra
         if type
           @nested_type = type.is_a?(Array)
           @type = [type].flatten.compact.first
+          if @type.ancestors.include?(Lycra::Attributes)
+            @type = Lycra::Types.custom(@type)
+          end
         end
         @type
       end
