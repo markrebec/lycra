@@ -39,7 +39,15 @@ module AwesomePrint
         end
 
         def resolver
-          attribute.resolver.is_a?(Symbol) ? (attribute.klass.name.yellowish + "##{attribute.resolver.to_s}".purpleish) : attribute.resolver.to_s.yellowish
+          if attribute.resolver.is_a?(Symbol)
+            if attribute.klass.instance_methods.include?(attribute.resolver)
+              (attribute.klass.name.yellowish + "##{attribute.resolver.to_s}".purpleish)
+            else
+              (attribute.klass.subject_type.name.yellowish + "##{attribute.resolver.to_s}".purpleish)
+            end
+          else
+            attribute.resolver.to_s.yellowish
+          end
         end
 
         def mappings
