@@ -128,12 +128,20 @@ module Lycra
 
         def self.valid?(value, required=false, nested=false)
           return true if !required && !value
-          value.is_a?(type) || value.is_a?(type.subject_type)
+          if value.is_a?(Enumerable)
+            value.all? { |val| val.is_a?(type) || val.is_a?(type.subject_type) }
+          else
+            value.is_a?(type) || value.is_a?(type.subject_type)
+          end
         end
 
         def self.transform(value)
           return value.resolve! if value.is_a?(type)
-          type.new(value).resolve!
+          if value.is_a?(Enumerable)
+            value.map { |val| type.new(val).resolve! }
+          else
+            type.new(value).resolve!
+          end
         end
       end
     end
