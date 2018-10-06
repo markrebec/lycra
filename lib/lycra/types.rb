@@ -127,8 +127,11 @@ module Lycra
         self.type(type)
 
         def self.valid?(value, required=false, nested=false)
-          return true if !required && !value
-          if value.is_a?(Enumerable)
+          return false if required && value.nil?
+          return true  if value.nil?
+          return false if nested && !value.is_a?(Enumerable)
+          return true  if nested && value.empty?
+          if nested
             value.all? { |val| val.is_a?(type) || val.is_a?(type.subject_type) }
           else
             value.is_a?(type) || value.is_a?(type.subject_type)

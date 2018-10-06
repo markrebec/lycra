@@ -53,7 +53,13 @@ module Lycra
 
       def mappings(mappings=nil)
         @mappings = mappings if mappings
-        {type: type.type}.merge(@mappings || {})
+
+        map_type = type.type
+        if map_type.is_a?(Class) && map_type.ancestors.include?(Lycra::Attributes)
+          map_type = @nested_type ? "nested" : "object"
+        end
+
+        {type: map_type}.merge(@mappings || {})
       end
       alias_method :mapping, :mappings
 
