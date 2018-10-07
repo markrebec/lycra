@@ -98,6 +98,19 @@ module Lycra
       Boolean
     end
 
+    class Hash < Type
+      klasses ::Hash
+
+      def self.valid?(value, required=false, nested=false)
+        return true if super(value, required, nested)
+        value.is_a?(Hash) || value.respond_to?(:to_h)
+      end
+    end
+
+    def self.hash
+      Hash
+    end
+
     class Object < Type
       klasses ::Hash
 
