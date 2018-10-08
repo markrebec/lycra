@@ -132,7 +132,7 @@ module Lycra
       end
 
       def respond_to_missing?(meth, priv=false)
-        attributes.key?(meth) || (subject && subject.respond_to?(meth, priv)) || super
+        meth == subject_type.to_s.underscore.to_sym || attributes.key?(meth) || (subject && subject.respond_to?(meth, priv)) || super
       end
 
       def inspect
