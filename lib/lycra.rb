@@ -14,7 +14,7 @@ require 'lycra/decorator'
 require 'lycra/decorator/model'
 require 'lycra/inheritance'
 require 'lycra/search'
-require 'lycra/multimodel'
+require 'lycra/multidoc'
 require 'lycra/engine' if defined?(Rails)
 require 'lycra/awesome_print' if defined?(AwesomePrint)
 
@@ -52,7 +52,7 @@ module Lycra
   end
 
   def self.search(query_or_payload, models=[], options={})
-    models = Multimodel.new(models)
+    models = Multidoc.new(models)
     request = Elasticsearch::Model::Searching::SearchRequest.new(models, query_or_payload, options)
     Elasticsearch::Model::Response::Response.new(models, request)
   end

@@ -8,7 +8,6 @@ module Lycra
       base.send :attr_accessor, :subject
       base.send :extend, ClassMethods
       base.send :include, InstanceMethods
-      base.send :delegate, :attributes, to: base
 
       base.class_eval do
         # TODO only for activerecord models??
@@ -23,12 +22,7 @@ module Lycra
         # This clones parent attribues down to inheriting child classes
         child.send :instance_variable_set,
                    :@_lycra_attributes,
-                   Collection.new(child, self.attributes.map { |k,attr|
-                     duped = attr.dup
-                     duped.instance_variable_set(:@klass, child)
-                     [k, duped]
-                   }.to_h)
-        child.send :delegate, :attributes, to: child
+                   self.attributes.dup(child)
       end
 
       def types
@@ -100,6 +94,10 @@ module Lycra
 
       def initialize(subject)
         @subject = subject
+      end
+
+      def attributes
+        @attributes ||= self.class.attributes.dup
       end
 
       def resolve!(*args, **options)

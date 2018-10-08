@@ -3,75 +3,45 @@ module Elasticsearch
     module Adapter
       module Lycra
 
-        # An adapter to be used for deserializing results from multiple documents,
-        # retrieved through `Lycra.search`
-        #
-        # @see Lycra.search
-        #
         module Multiple
-          Adapter.register self, lambda { |klass| klass.is_a? ::Lycra::Multimodel }
+          Adapter.register self, lambda { |klass| klass.is_a? ::Lycra::Multidoc }
 
           module Records
-            # Returns a collection of model instances, possibly of different classes (ActiveRecord, Mongoid, ...)
-            #
-            # @note The order of results in the Elasticsearch response is preserved
-            #
+            #def documents
+            #  documents_by_type = __documents_by_type
+
+            #  documents = response.response["hits"]["hits"].map do |hit|
+            #    documents_by_type[ __type_for_hit(hit) ][ hit[:_id] ]
+            #  end
+
+            #  documents.compact
+            #end
+
             def records
-              records_by_type = __records_by_type
+              documents_by_type = __documents_by_type
 
               records = response.response["hits"]["hits"].map do |hit|
-                records_by_type[ __type_for_hit(hit) ][ hit[:_id] ]
+                documents_by_type[ __type_for_hit(hit) ][ hit[:_id] ]#.subject
               end
 
               records.compact
             end
 
-            # Returns the collection of records grouped by class based on `_type`
-            #
-            # Example:
-            #
-            # {
-            #   Foo  => {"1"=> #<Foo id: 1, title: "ABC"}, ...},
-            #   Bar  => {"1"=> #<Bar id: 1, name: "XYZ"}, ...}
-            # }
-            #
-            # @api private
-            #
-            def __records_by_type
+            def __documents_by_type
               result = __ids_by_type.map do |klass, ids|
-                records = __records_for_klass(klass, ids)
-                ids     = records.map(&:id).map(&:to_s)
-                [ klass, Hash[ids.zip(records)] ]
+                documents = __documents_for_klass(klass, ids)
+                ids     = documents.map(&:id).map(&:to_s)
+                mapped = [ klass, Hash[ids.zip(documents)] ]
+                mapped
               end
 
               Hash[result]
             end
 
-            # Returns the collection of records for a specific type based on passed `klass`
-            #
-            # @api private
-            #
-            def __records_for_klass(klass, ids)
-              adapter = __adapter_for_klass(klass)
-
-              case
-                when Elasticsearch::Model::Adapter::ActiveRecord.equal?(adapter)
-                  klass.where(klass.primary_key => ids)
-                when Elasticsearch::Model::Adapter::Mongoid.equal?(adapter)
-                  klass.where(:id.in => ids)
-                else
-                  klass.find(ids)
-              end
+            def __documents_for_klass(klass, ids)
+              return klass.subject_type.where(klass.primary_key => ids)
             end
 
-            # Returns the record IDs grouped by class based on type `_type`
-            #
-            # Example:
-            #
-            #   { Foo => ["1"], Bar => ["1", "5"] }
-            #
-            # @api private
-            #
             def __ids_by_type
               ids_by_type = {}
 
@@ -83,31 +53,14 @@ module Elasticsearch
               ids_by_type
             end
 
-            # Returns the class of the model corresponding to a specific `hit` in Elasticsearch results
-            #
-            # @see Elasticsearch::Model::Registry
-            #
-            # @api private
-            #
             def __type_for_hit(hit)
               @@__types ||= {}
 
               @@__types[ "#{hit[:_index]}::#{hit[:_type]}" ] ||= begin
-                # TODO do we wanna add a lycra registry?
-                #
-                #Registry.all.detect do |model|
-                #  model.index_name == hit[:_index] && model.document_type == hit[:_type]
-                #end
-                hit[:_type].camelize.constantize
+                ::Lycra::Document::Registry.all.detect do |document|
+                  hit[:_index] =~ /\A#{document.index_name}(-\d+)?\Z/ && document.document_type == hit[:_type]
+                end
               end
-            end
-
-            # Returns the adapter registered for a particular `klass` or `nil` if not available
-            #
-            # @api private
-            #
-            def __adapter_for_klass(klass)
-              Adapter.adapters.select { |name, checker| checker.call(klass) }.keys.first
             end
           end
         end

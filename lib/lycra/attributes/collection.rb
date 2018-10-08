@@ -10,6 +10,14 @@ module Lycra
         @attributes = attributes
       end
 
+      def dup(klass=nil)
+        self.class.new(klass || @klass, attributes.map { |k,attr|
+          duped = attr.dup
+          duped.instance_variable_set(:@klass, klass || @klass)
+          [k, duped]
+        }.to_h)
+      end
+
       def each(&block)
         @attributes.each(&block)
       end
