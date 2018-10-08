@@ -1,3 +1,20 @@
+# This is for awesome_print, which wants a to_hash method on objects to print
+# them out.
+
+require 'elasticsearch/model/response/result'
+
+module Elasticsearch
+  module Model
+    module Response
+      class Result
+        def to_hash
+          to_h
+        end
+      end
+    end
+  end
+end
+
 # The Problem:
 #
 # https://github.com/elastic/elasticsearch-rails/issues/421
@@ -15,6 +32,9 @@
 # to match the index names against each other. The regex pattern used below makes the timestamp optional, and allows for both
 # 'my-index' and 'my-index-123456789' to match against 'my-index'
 
+# TODO
+# REMOVE THIS AFTER CREATING OUR OWN MULTIMODEL
+=begin
 module Elasticsearch
   module Model
     module Adapter
@@ -44,3 +64,4 @@ module Elasticsearch
     end
   end
 end
+=end

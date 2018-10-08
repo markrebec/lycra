@@ -2,7 +2,7 @@ require 'logger'
 require 'canfig'
 require 'elasticsearch/model'
 require 'elasticsearch/model/adapters/lycra'
-#require 'lycra/monkeypatches' # TODO still need this?
+require 'lycra/monkeypatches'
 require 'lycra/errors'
 require 'lycra/types'
 require 'lycra/attributes'
