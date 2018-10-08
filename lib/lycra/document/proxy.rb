@@ -1,3 +1,5 @@
+require 'lycra/document/registry'
+
 module Lycra
   module Document
     module Proxy
@@ -22,6 +24,8 @@ module Lycra
             include  ::Elasticsearch::Model::Importing::ClassMethods
             include  ::Elasticsearch::Model::Adapter.from_class(base).importing_mixin
           end
+
+          Registry.add(base)
         end
       end
 
@@ -41,6 +45,8 @@ module Lycra
               include  ::Elasticsearch::Model::Adapter.from_class(child).importing_mixin
             end
           end
+
+          Registry.add(child)
         end
 
         def import_scope(scope=nil, &block)
