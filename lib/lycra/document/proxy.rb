@@ -64,9 +64,23 @@ module Lycra
           __lycra__.create_index!(options)
         end
 
+        def create_index(options={})
+          create_index!(options)
+        rescue => e
+          Lycra.configuration.logger.error(e.message)
+          return false
+        end
+
         def delete_index!(options={})
           raise Lycra::AbstractClassError, "Cannot delete using an abstract class" if abstract?
           __lycra__.delete_index!(options)
+        end
+
+        def delete_index(options={})
+          delete_index!(options)
+        rescue => e
+          Lycra.configuration.logger.error(e.message)
+          return false
         end
 
         def refresh_index!(options={})
@@ -74,7 +88,14 @@ module Lycra
           __lycra__.refresh_index!(options)
         end
 
-        def import(options={}, &block)
+        def refresh_index(options={})
+          refresh_index!(options)
+        rescue => e
+          Lycra.configuration.logger.error(e.message)
+          return false
+        end
+
+        def import!(options={}, &block)
           raise Lycra::AbstractClassError, "Cannot import using an abstract class" if abstract?
 
           scope_hash = {}
@@ -83,6 +104,13 @@ module Lycra
           options = scope_hash.merge(options)
 
           __lycra__.import(options, &block)
+        end
+
+        def import(options={}, &block)
+          import!(options, &block)
+        rescue => e
+          Lycra.configuration.logger.error(e.message)
+          return false
         end
 
         def as_indexed_json(subj, options={})
