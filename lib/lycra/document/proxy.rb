@@ -26,7 +26,7 @@ module Lycra
       end
 
       module ClassMethods
-        delegate :index_name, :document_type, :create_index!, :delete_index!, :import, :search, to: :__lycra__
+        delegate :index_name, :document_type, :search, to: :__lycra__
 
         def inherited(child)
           super if defined?(super)
@@ -51,6 +51,32 @@ module Lycra
 
         def import_scope=(scope)
           import_scope scope
+        end
+
+        def create_index!(options={})
+          raise Lycra::AbstractClassError, "Cannot create using an abstract class" if abstract?
+          __lycra__.create_index!(options)
+        end
+
+        def delete_index!(options={})
+          raise Lycra::AbstractClassError, "Cannot delete using an abstract class" if abstract?
+          __lycra__.delete_index!(options)
+        end
+
+        def refresh_index!(options={})
+          raise Lycra::AbstractClassError, "Cannot refresh using an abstract class" if abstract?
+          __lycra__.refresh_index!(options)
+        end
+
+        def import(options={}, &block)
+          raise Lycra::AbstractClassError, "Cannot import using an abstract class" if abstract?
+
+          scope_hash = {}
+          scope_hash[:scope] = import_scope if import_scope.is_a?(String) || import_scope.is_a?(Symbol)
+          scope_hash[:query] = import_scope if import_scope.is_a?(Proc)
+          options = scope_hash.merge(options)
+
+          __lycra__.import(options, &block)
         end
 
         def as_indexed_json(subj, options={})
@@ -187,32 +213,6 @@ module Lycra
         def settings(settings=nil)
           @_lycra_settings = settings if settings
           @_lycra_settings || {}
-        end
-
-        def create_index!(options={})
-          raise Lycra::AbstractClassError, "Cannot create using an abstract class" if abstract?
-          super
-        end
-
-        def delete_index!(options={})
-          raise Lycra::AbstractClassError, "Cannot delete using an abstract class" if abstract?
-          super
-        end
-
-        def refresh_index!(options={})
-          raise Lycra::AbstractClassError, "Cannot refresh using an abstract class" if abstract?
-          super
-        end
-
-        def import(options={}, &block)
-          raise Lycra::AbstractClassError, "Cannot import using an abstract class" if abstract?
-
-          scope_hash = {}
-          scope_hash[:scope] = import_scope if import_scope.is_a?(String) || import_scope.is_a?(Symbol)
-          scope_hash[:query] = import_scope if import_scope.is_a?(Proc)
-          options = scope_hash.merge(options)
-
-          super(*args, **options, &block)
         end
       end
 
