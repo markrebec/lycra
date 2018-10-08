@@ -11,15 +11,11 @@ module Lycra
         end
 
         def all
-          new(documents.dup)
+          new(documents.reject(&:abstract?))
         end
 
         def abstract
           new(documents.select(&:abstract?))
-        end
-
-        def concrete
-          new(documents.reject(&:abstract?))
         end
       end
 
