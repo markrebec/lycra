@@ -125,6 +125,7 @@ module Lycra
       end
 
       def method_missing(meth, *args, &block)
+        return subject if meth == subject_type.to_s.underscore.to_sym
         return attributes[meth].resolve!(self, *args, &block) if attributes.key?(meth)
         return subject.send(meth, *args, &block) if subject && subject.respond_to?(meth)
         super
