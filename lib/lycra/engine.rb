@@ -11,5 +11,9 @@ module Lycra
     initializer "lycra.elasticsearch.client" do |app|
       Elasticsearch::Model.client = Lycra.client
     end
+
+    initializer "lycra.load_documents" do
+      Dir[File.join(Rails.root, "app/documents/**/*.rb")].each { |f| require f }
+    end
   end
 end
