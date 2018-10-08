@@ -103,11 +103,33 @@ module Lycra
           resolve!.as_json(options)
         end
 
-        def index!
+        def index!(options={})
           raise Lycra::AbstractClassError, "Cannot index using an abstract class" if abstract?
 
           @indexed = nil
-          __lycra__.index_document
+          __lycra__.index_document(options)
+        end
+
+        def update!(options={})
+          raise Lycra::AbstractClassError, "Cannot update using an abstract class" if abstract?
+
+          @indexed = nil
+          __lycra__.update_document(options)
+        end
+
+        def update_attributes!(*attrs, **options)
+          raise Lycra::AbstractClassError, "Cannot update using an abstract class" if abstract?
+
+          if attrs.empty?
+            document_attrs = resolve!
+          else
+            document_attrs = resolve!(only: attrs)
+          end
+
+          @indexed = nil
+          __lycra__.update_document_attributes(document_attrs, options)
+        rescue Elasticsearch::Transport::Transport::Errors::NotFound => e
+          index!(options)
         end
 
         def _indexed
