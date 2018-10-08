@@ -4,7 +4,7 @@ module Lycra
 
     def initialize(*documents)
       @documents = documents.flatten
-      @documents = Lycra::Document::Registry.concrete if @documents.empty?
+      @documents = Lycra::Document::Registry.all if @documents.empty?
     end
 
     def index_name
