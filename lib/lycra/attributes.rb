@@ -72,6 +72,7 @@ module Lycra
           result = subject_type.send(meth, *args, &block)
 
           return result.try(:document) || new(result) if result.is_a?(subject_type)
+          return result if result.is_a?(ActiveRecord::Relation)
           return result.map { |r| r.try(:document) || new(r) } if result.is_a?(Enumerable) && result.first.is_a?(subject_type)
 
           return result
