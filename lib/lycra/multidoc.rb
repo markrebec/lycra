@@ -8,7 +8,7 @@ module Lycra
     end
 
     def index_name
-      documents.map { |d| d.index_name }
+      documents.map { |d| d.alias_name }
     end
 
     def document_type

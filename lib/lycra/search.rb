@@ -51,9 +51,9 @@ module Lycra
 
     def search(qry=nil, &block)
       if block_given?
-        Elasticsearch::Model.search(instance_eval(&block), models)
+        Lycra.search(instance_eval(&block), models)
       else
-        Elasticsearch::Model.search((qry || to_query), models)
+        Lycra.search((qry || to_query), models)
       end
     end
 

@@ -30,7 +30,9 @@ module Lycra
       end
 
       module ClassMethods
-        delegate :index_name, :document_type, :search, to: :__lycra__
+        delegate :alias_name, :index_name, :document_type, :search,
+          :alias_exists?, :index_exists?, :index_aliased?, :aliased_index,
+          to: :__lycra__
 
         def inherited(child)
           super if defined?(super)
@@ -59,9 +61,22 @@ module Lycra
           import_scope scope
         end
 
+        def create_alias!(options={})
+          raise Lycra::AbstractClassError, "Cannot create aliases using an abstract class" if abstract?
+          __lycra__.create_alias!(options)
+        end
+
+        def create_alias(options={})
+          create_alias!(options)
+        rescue => e
+          Lycra.configuration.logger.error(e.message)
+          return false
+        end
+
         def create_index!(options={})
-          raise Lycra::AbstractClassError, "Cannot create using an abstract class" if abstract?
+          raise Lycra::AbstractClassError, "Cannot create indices using an abstract class" if abstract?
           __lycra__.create_index!(options)
+          __lycra__.create_alias!(options) unless alias_exists?
         end
 
         def create_index(options={})
@@ -71,8 +86,21 @@ module Lycra
           return false
         end
 
+        def delete_alias!(options={})
+          raise Lycra::AbstractClassError, "Cannot delete aliases using an abstract class" if abstract?
+          __lycra__.delete_alias!(options)
+        end
+
+        def delete_alias(options={})
+          delete_alias!(options)
+        rescue => e
+          Lycra.configuration.logger.error(e.message)
+          return false
+        end
+
         def delete_index!(options={})
-          raise Lycra::AbstractClassError, "Cannot delete using an abstract class" if abstract?
+          raise Lycra::AbstractClassError, "Cannot delete indices using an abstract class" if abstract?
+          __lycra__.delete_alias!(options) if alias_exists?
           __lycra__.delete_index!(options)
         end
 
@@ -84,7 +112,7 @@ module Lycra
         end
 
         def refresh_index!(options={})
-          raise Lycra::AbstractClassError, "Cannot refresh using an abstract class" if abstract?
+          raise Lycra::AbstractClassError, "Cannot refresh indices using an abstract class" if abstract?
           __lycra__.refresh_index!(options)
         end
 
@@ -240,9 +268,18 @@ module Lycra
           include ::Elasticsearch::Model::Searching::ClassMethods
         end
 
+        def alias_name(index_alias=nil)
+          @_lycra_alias_name = index_alias if index_alias
+          @_lycra_alias_name ||= document_type.pluralize
+        end
+
+        def alias_name=(index_alias)
+          alias_name index_alias
+        end
+
         def index_name(index=nil)
           @_lycra_index_name = index if index
-          @_lycra_index_name ||= document_type.pluralize
+          @_lycra_index_name ||= "#{alias_name}-#{Digest::MD5.hexdigest(mappings.to_s)}"
         end
 
         def index_name=(index)
@@ -269,6 +306,35 @@ module Lycra
         def settings(settings=nil)
           @_lycra_settings = settings if settings
           @_lycra_settings || {}
+        end
+
+        def search(query_or_payload, options={})
+          options = {index: alias_name}.merge(options)
+          super(query_or_payload, options)
+        end
+
+        def alias_exists?
+          client.indices.exists_alias? name: alias_name
+        end
+
+        def aliased_index
+          client.indices.get_alias(name: alias_name).keys.first
+        end
+
+        def index_aliased?
+          alias_exists? && aliased_index == index_name
+        end
+
+        def create_alias!(options={})
+          # TODO custom error classes
+          raise "Alias already exists" if alias_exists?
+          client.indices.put_alias name: alias_name, index: index_name
+        end
+
+        def delete_alias!(options={})
+          # TODO custom error classes
+          raise "Alias does not exists" unless alias_exists?
+          client.indices.delete_alias name: alias_name, index: aliased_index
         end
       end
 
