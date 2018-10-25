@@ -26,8 +26,8 @@ module Lycra
       new(*args).reindex(**opts, &block)
     end
 
-    def self.delete(*args, **opts, &block)
-      new(*args).delete(**opts, &block)
+    def self.truncate(*args, **opts, &block)
+      new(*args).truncate(**opts, &block)
     end
 
     def initialize(*documents)
@@ -107,7 +107,7 @@ module Lycra
       end
     end
 
-    def delete(batch_size: 200, scope: nil, query: nil, &block)
+    def truncate(batch_size: 200, scope: nil, query: nil, &block)
       documents.each do |document|
         document.delete! batch_size: batch_size, scope: scope, query: query, &block
       end
