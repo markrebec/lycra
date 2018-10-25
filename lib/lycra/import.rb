@@ -7,7 +7,11 @@ module Lycra
     end
 
     def self.rotate(*args, **opts, &block)
-      new(*args).import(**opts, &block)
+      new(*args).rotate(**opts, &block)
+    end
+
+    def self.reindex(*args, **opts, &block)
+      new(*args).reindex(**opts, &block)
     end
 
     def initialize(*documents)
@@ -39,12 +43,9 @@ module Lycra
 
     def rotate(batch_size: 200, &block)
       documents.each do |document|
-        if document.index_exists?
-          document.update! batch_size: batch_size, &block
-        else
-          document.create_index!
-          document.import! batch_size: batch_size, &block
-        end
+        document.create_index! unless document.index_exists?
+
+        document.update! batch_size: batch_size, &block
 
         unless document.index_aliased?
           if document.alias_exists?
