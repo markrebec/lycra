@@ -32,7 +32,7 @@ module Lycra
       module ClassMethods
         delegate :alias_name, :index_name, :document_type, :search,
           :alias_exists?, :index_exists?, :index_aliased?, :aliased_index,
-          to: :__lycra__
+          :index_fingerprint, to: :__lycra__
 
         def inherited(child)
           super if defined?(super)
@@ -377,6 +377,21 @@ module Lycra
           include ::Elasticsearch::Model::Searching::ClassMethods
         end
 
+        def index_fingerprint(hashed=nil)
+          @_lycra_index_fingerprint = hashed if hashed
+          @_lycra_index_fingerprint ||= Digest::MD5.hexdigest(mappings.to_s)
+
+          if @_lycra_index_fingerprint.is_a?(Proc)
+            instance_exec(&@_lycra_index_fingerprint)
+          else
+            @_lycra_index_fingerprint
+          end
+        end
+
+        def index_fingerprint=(hashed)
+          index_fingerprint hashed
+        end
+
         def alias_name(index_alias=nil)
           @_lycra_alias_name = index_alias if index_alias
           @_lycra_alias_name ||= document_type.pluralize
@@ -388,7 +403,7 @@ module Lycra
 
         def index_name(index=nil)
           @_lycra_index_name = index if index
-          @_lycra_index_name ||= "#{alias_name}-#{Digest::MD5.hexdigest(mappings.to_s)}"
+          @_lycra_index_name ||= "#{alias_name}-#{index_fingerprint}"
         end
 
         def index_name=(index)
