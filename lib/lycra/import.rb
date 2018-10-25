@@ -35,16 +35,20 @@ module Lycra
       @documents = Lycra::Document::Registry.all if @documents.empty?
     end
 
-    def total
-      documents.sum do |doc|
+    def scopes
+      documents.map do |doc|
         if doc.import_scope.is_a?(Proc)
-          doc.subject_type.instance_exec(&doc.import_scope).count
+          doc.subject_type.instance_exec(&doc.import_scope)
         elsif doc.import_scope.is_a?(String) || doc.import_scope.is_a?(Symbol)
-          doc.subject_type.send(doc.import_scope).count
+          doc.subject_type.send(doc.import_scope)
         else
-          doc.all.count
+          doc.subject_type.all
         end
       end
+    end
+
+    def total
+      scopes.sum { |scope| scope.count }
     end
 
     def create(&block)
@@ -72,19 +76,17 @@ module Lycra
     end
 
     def import(batch_size: 200, scope: nil, query: nil, &block)
-      documents.each do |document|
-        document.delete_alias! if document.alias_exists?
-        document.delete_index! if document.index_exists?
-        document.create_index!
+      recreate
 
+      documents.each do |document|
         document.import! batch_size: batch_size, scope: scope, query: query, &block
       end
     end
 
     def rotate(batch_size: 200, scope: nil, query: nil, &block)
-      documents.each do |document|
-        document.create_index! unless document.index_exists?
+      create
 
+      documents.each do |document|
         document.update! batch_size: batch_size, scope: scope, query: query, &block
 
         unless document.index_aliased?
