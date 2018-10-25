@@ -126,10 +126,8 @@ module Lycra
         def import!(options={}, &block)
           raise Lycra::AbstractClassError, "Cannot import using an abstract class" if abstract?
 
-          scope_hash = {}
-          scope_hash[:scope] = import_scope if import_scope.is_a?(String) || import_scope.is_a?(Symbol)
-          scope_hash[:query] = import_scope if import_scope.is_a?(Proc)
-          options = scope_hash.merge(options)
+          options[:scope] ||= import_scope if import_scope.is_a?(String) || import_scope.is_a?(Symbol)
+          options[:query] ||= import_scope if import_scope.is_a?(Proc)
 
           __lycra__.import(options, &block)
         end

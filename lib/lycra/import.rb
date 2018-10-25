@@ -26,6 +26,10 @@ module Lycra
       new(*args).reindex(**opts, &block)
     end
 
+    def self.delete(*args, **opts, &block)
+      new(*args).delete(**opts, &block)
+    end
+
     def initialize(*documents)
       @documents = documents
       @documents = Lycra::Document::Registry.all if @documents.empty?
@@ -67,21 +71,21 @@ module Lycra
       end
     end
 
-    def import(batch_size: 200, &block)
+    def import(batch_size: 200, scope: nil, query: nil, &block)
       documents.each do |document|
         document.delete_alias! if document.alias_exists?
         document.delete_index! if document.index_exists?
         document.create_index!
 
-        document.import! batch_size: batch_size, &block
+        document.import! batch_size: batch_size, scope: scope, query: query, &block
       end
     end
 
-    def rotate(batch_size: 200, &block)
+    def rotate(batch_size: 200, scope: nil, query: nil, &block)
       documents.each do |document|
         document.create_index! unless document.index_exists?
 
-        document.update! batch_size: batch_size, &block
+        document.update! batch_size: batch_size, scope: scope, query: query, &block
 
         unless document.index_aliased?
           if document.alias_exists?
@@ -95,9 +99,15 @@ module Lycra
       end
     end
 
-    def reindex(batch_size: 200, &block)
+    def reindex(batch_size: 200, scope: nil, query: nil, &block)
       documents.each do |document|
-        document.update! batch_size: batch_size, &block
+        document.update! batch_size: batch_size, scope: scope, query: query, &block
+      end
+    end
+
+    def delete(batch_size: 200, scope: nil, query: nil, &block)
+      documents.each do |document|
+        document.delete! batch_size: batch_size, scope: scope, query: query, &block
       end
     end
   end
