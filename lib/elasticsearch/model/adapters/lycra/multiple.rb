@@ -58,7 +58,7 @@ module Elasticsearch
 
               @@__types[ "#{hit[:_index]}::#{hit[:_type]}" ] ||= begin
                 ::Lycra::Document::Registry.all.detect do |document|
-                  hit[:_index] =~ /\A#{document.index_name}(-\d+)?\Z/ && document.document_type == hit[:_type]
+                  hit[:_index] =~ /\A#{document.index_name}(-[a-zA-Z0-9]+)?\Z/ && document.document_type == hit[:_type]
                 end
               end
             end
