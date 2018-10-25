@@ -57,5 +57,11 @@ module Lycra
         end
       end
     end
+
+    def reindex(batch_size: 200, &block)
+      documents.each do |document|
+        document.update! batch_size: batch_size, &block
+      end
+    end
   end
 end
