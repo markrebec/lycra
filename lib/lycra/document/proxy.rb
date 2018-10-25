@@ -152,13 +152,14 @@ module Lycra
           end
 
           scope.find_in_batches(batch_size: (options[:batch_size] || 200)).each do |batch|
+            json_options = options.select { |k,v| [:only,:except].include?(k) }
             items = batch.map do |record|
               { update: {
                   _index: index_name,
                   _type: document_type,
                   _id: record.id,
                   data: {
-                    doc: new(record).as_indexed_json
+                    doc: new(record).resolve!(json_options)
                   }.stringify_keys
                 }.stringify_keys
               }.stringify_keys
@@ -172,12 +173,17 @@ module Lycra
 
                 update = miss['update']
                 item = items.find { |i| i['update']['_id'].to_s == miss['update']['_id'] }['update']
+                if json_options.empty?
+                  data = item['data']['doc']
+                else
+                  data = new(subject_type.find(update['_id'])).resolve!
+                end
 
                 { index: {
                     _index: update['_index'],
                     _type: update['_type'],
                     _id: update['_id'],
-                    data: item['data']['doc']
+                    data: data
                   }.stringify_keys
                 }.stringify_keys
               else
