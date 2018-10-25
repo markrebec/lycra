@@ -168,6 +168,8 @@ This will cause downtime as the index is being repopulated by the import.
 
 When your mappings change, the index fingerprint will change, which requires that you create that new index and populate it.
 
+Any callbacks and/or background jobs may fail until you create the new index. Once they're created, callbacks & jobs will be updating the new index.
+
 The alias will continue pointing to your old index while the new one is being populated, and all search queries will cotinue to reference the alias. This allows your app to stay up using the old index until the new one is ready to be swapped in.
 
 ### Reindexing
