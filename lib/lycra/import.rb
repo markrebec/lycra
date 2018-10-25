@@ -33,15 +33,18 @@ module Lycra
         document.delete_index! if document.index_exists?
         document.create_index!
 
-        document.import batch_size: batch_size, &block
+        document.import! batch_size: batch_size, &block
       end
     end
 
     def rotate(batch_size: 200, &block)
       documents.each do |document|
-        document.create_index! unless document.index_exists?
-
-        document.import batch_size: batch_size, &block
+        if document.index_exists?
+          document.update! batch_size: batch_size, &block
+        else
+          document.create_index!
+          document.import! batch_size: batch_size, &block
+        end
 
         unless document.index_aliased?
           if document.alias_exists?

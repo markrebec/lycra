@@ -141,6 +141,73 @@ module Lycra
           return false
         end
 
+        def update!(options={}, &block)
+          raise Lycra::AbstractClassError, "Cannot update using an abstract class" if abstract?
+
+          if import_scope.is_a?(Proc)
+            scope = subject_type.instance_exec(&import_scope)
+          elsif import_scope.is_a?(String) || import_scope.is_a?(Symbol)
+            scope = subject_type.send(import_scope)
+          else
+            scope = subject_type.all
+          end
+
+          scope.find_in_batches(batch_size: (options[:batch_size] || 200)).each do |batch|
+            items = batch.map do |record|
+              { update: {
+                  _index: index_name,
+                  _type: document_type,
+                  _id: record.id,
+                  data: {
+                    doc: new(record).as_indexed_json
+                  }.stringify_keys
+                }.stringify_keys
+              }.stringify_keys
+            end
+
+            updated = __lycra__.client.bulk(body: items)
+
+            missing = updated['items'].map do |miss|
+              if miss['update'].key?('error') &&
+                 miss['update']['error']['type'] == 'document_missing_exception'
+
+                update = miss['update']
+                item = items.find { |i| i['update']['_id'].to_s == miss['update']['_id'] }['update']
+
+                { index: {
+                    _index: update['_index'],
+                    _type: update['_type'],
+                    _id: update['_id'],
+                    data: item['data']['doc']
+                  }.stringify_keys
+                }.stringify_keys
+              else
+                nil
+              end
+            end.compact
+
+            if missing.count > 0
+              indexed = __lycra__.client.bulk body: missing
+
+              updated['items'] = updated['items'].map do |item|
+                miss = indexed['items'].find { |i| i['index']['_id'] == item['update']['_id'] }
+                miss || item
+              end
+            end
+
+            yield(updated) if block_given?
+          end
+
+          return true
+        end
+
+        def update(options={}, &block)
+          update!(options, &block)
+        rescue => e
+          Lycra.configuration.logger.error(e.message)
+          return false
+        end
+
         def as_indexed_json(subj, options={})
           resolve!(subj).as_json(options)
         end
