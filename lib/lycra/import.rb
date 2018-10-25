@@ -10,8 +10,8 @@ module Lycra
       new(*args).recreate(&block)
     end
 
-    def self.delete(*args, &block)
-      new(*args).delete(&block)
+    def self.destroy(*args, &block)
+      new(*args).destroy(&block)
     end
 
     def self.import(*args, **opts, &block)
@@ -59,7 +59,7 @@ module Lycra
       end
     end
 
-    def delete(&block)
+    def destroy(&block)
       documents.each do |document|
         document.delete_alias! if document.alias_exists?
         document.delete_index! if document.index_exists?
