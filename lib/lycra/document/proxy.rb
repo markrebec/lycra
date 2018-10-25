@@ -209,6 +209,43 @@ module Lycra
           return false
         end
 
+        def delete!(options={}, &block)
+          raise Lycra::AbstractClassError, "Cannot delete using an abstract class" if abstract?
+
+          scope = options[:scope] || options[:query] || import_scope
+          if scope.is_a?(Proc)
+            scope = subject_type.instance_exec(&scope)
+          elsif scope.is_a?(String) || scope.is_a?(Symbol)
+            scope = subject_type.send(scope)
+          elsif scope.nil?
+            scope = subject_type.all
+          end
+
+          scope.find_in_batches(batch_size: (options[:batch_size] || 200)).each do |batch|
+            items = batch.map do |record|
+              { delete: {
+                  _index: index_name,
+                  _type: document_type,
+                  _id: record.id
+                }.stringify_keys
+              }.stringify_keys
+            end
+
+            deleted = __lycra__.client.bulk(body: items)
+
+            yield(deleted) if block_given?
+          end
+
+          return true
+        end
+
+        def delete(options={}, &block)
+          delete!(options, &block)
+        rescue => e
+          Lycra.configuration.logger.error(e.message)
+          return false
+        end
+
         def as_indexed_json(subj, options={})
           resolve!(subj).as_json(options)
         end
