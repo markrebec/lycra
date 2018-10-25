@@ -143,9 +143,38 @@ end
 
 ## IMPORT / ROTATE / REINDEX
 
-`import`: used for initializing. delete/create index & alias, perform a fresh import
-`rotate`: used when mappings change. create a new index, import, hot-swap alias
-`reindex`: used when data changes (but not mappings). update all documents in the index
+All methods take a `batch_size: 200` (default) keyword argument and can accept a block which will be yielded each batch result as it is processed.
+
+For example if you wanted to perform an import while displaying a progress bar:
+
+```
+importer = Lycra::Import.new # you can pass an array of documents, otherwise defaults to all documents
+bar = ProgressBar.new(importer.total) # total number of records to be processed
+
+importer.import(batch_size: 200) do |batch|
+  bar.increment!(batch['items'].count) # batch is the result of the batch import
+end
+```
+
+### Importing
+
+`Lycra::Import.import` is used for (re)initializing new indices. It deletes and creates the index & alias, then perform a fresh import.
+
+This will cause downtime as the index is being repopulated by the import.
+
+### Rotating
+
+`Lycra::Import.rotate` is used when index mappings are changed. It creates a new index, performs an import, then hot-swaps the alias to the new index.
+
+When your mappings change, the index fingerprint will change, which requires that you create that new index and populate it.
+
+The alias will continue pointing to your old index while the new one is being populated, and all search queries will cotinue to reference the alias. This allows your app to stay up using the old index until the new one is ready to be swapped in.
+
+### Reindexing
+
+`Lycra::Import.reindex` is used when data changes (but not mappings). It updates all documents in the index using bulk updates.
+
+If your mappings have changed at all that means your index fingerprint will have changed, and you will need to use `import` then swap your aliases manually, or use to `rotate` to populate and swap in one shot.
 
 ## TODO / IDEAS
 
