@@ -144,11 +144,12 @@ module Lycra
         def update!(options={}, &block)
           raise Lycra::AbstractClassError, "Cannot update using an abstract class" if abstract?
 
-          if import_scope.is_a?(Proc)
-            scope = subject_type.instance_exec(&import_scope)
-          elsif import_scope.is_a?(String) || import_scope.is_a?(Symbol)
-            scope = subject_type.send(import_scope)
-          else
+          scope = options[:scope] || options[:query] || import_scope
+          if scope.is_a?(Proc)
+            scope = subject_type.instance_exec(&scope)
+          elsif scope.is_a?(String) || scope.is_a?(Symbol)
+            scope = subject_type.send(scope)
+          elsif scope.nil?
             scope = subject_type.all
           end
 

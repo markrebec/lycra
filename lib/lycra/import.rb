@@ -2,6 +2,18 @@ module Lycra
   class Import
     attr_reader :documents
 
+    def self.create(*args, &block)
+      new(*args).create(&block)
+    end
+
+    def self.recreate(*args, &block)
+      new(*args).recreate(&block)
+    end
+
+    def self.delete(*args, &block)
+      new(*args).delete(&block)
+    end
+
     def self.import(*args, **opts, &block)
       new(*args).import(**opts, &block)
     end
@@ -28,6 +40,30 @@ module Lycra
         else
           doc.all.count
         end
+      end
+    end
+
+    def create(&block)
+      documents.each do |document|
+        document.create_index! unless document.index_exists?
+        yield(document) if block_given?
+      end
+    end
+
+    def recreate(&block)
+      documents.each do |document|
+        document.delete_alias! if document.alias_exists?
+        document.delete_index! if document.index_exists?
+        document.create_index!
+        yield(document) if block_given?
+      end
+    end
+
+    def delete(&block)
+      documents.each do |document|
+        document.delete_alias! if document.alias_exists?
+        document.delete_index! if document.index_exists?
+        yield(document) if block_given?
       end
     end
 
