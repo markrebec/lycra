@@ -141,6 +141,12 @@ class TruckDocument < VehicleDocument
 end
 ```
 
+## IMPORT / ROTATE / REINDEX
+
+`import`: used for initializing. delete/create index & alias, perform a fresh import
+`rotate`: used when mappings change. create a new index, import, hot-swap alias
+`reindex`: used when data changes (but not mappings). update all documents in the index
+
 ## TODO / IDEAS
 
 * import scope
